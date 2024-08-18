@@ -1,4 +1,4 @@
-import Ajv, {type JSONSchemaType} from "ajv"
+
 
 export interface User {
     // username:string
@@ -6,7 +6,7 @@ export interface User {
     password:string
 }
 
-export const userSchema:JSONSchemaType<User>={
+export const userSchema ={
     type:"object",
     properties:{
         // username:{
@@ -20,6 +20,7 @@ export const userSchema:JSONSchemaType<User>={
         },
         password:{
             type:"string",
+            // format: "password",
             minLength:5
         }
         ,
