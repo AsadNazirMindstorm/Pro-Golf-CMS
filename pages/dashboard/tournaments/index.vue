@@ -207,16 +207,9 @@ export default {
                 this.loading = false
             })
         },
-
-        toggleSelectAll() {
-            if (this.selectAll) {
-                this.selectedItems = [...this.serverItems]
-            } else {
-                this.selectedItems = []
-            }
-        },
-
     },
+
+    //Watching on tournaments
     watch: {
         tournaments() {
             this.search = String(Date.now())
