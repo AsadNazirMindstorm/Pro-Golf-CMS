@@ -48,7 +48,9 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useAjv } from '~/composable/Ajv';
 import type { Meta } from '~/schemas/tournament/metaSchema';
+import metaSchema from '~/schemas/tournament/metaSchema';
 
 // Reactive state
 const e1 = ref(1);
@@ -60,23 +62,32 @@ const items = ref([
     'Submit',
 ]);
 
-let metaFormData:Meta;
+let metaFormData: Meta;
 
 // Methods
 const nextClick = (callback: () => void) => {
+
+    //Meta form data validation
+    if (e1.value == 1) {
+        const isValid = useAjv().validate(metaSchema, metaFormData);
+        if (!isValid) {
+            alert("Please Enter Correct data");
+            return;
+        }
+        callback();
+
+    }
     console.log(metaFormData);
-    callback();
 };
 
 const handleSubmit = () => {
     // Add your submit logic here
 };
- 
+
 //Handling Meta Data form over here
-const handleMetaDataForm = (newMetaFormData:Meta)=>
-{
+const handleMetaDataForm = (newMetaFormData: Meta) => {
     metaFormData = newMetaFormData;
-    console.log(metaFormData);
+    //console.log(metaFormData);
 }
 
 // Computed properties

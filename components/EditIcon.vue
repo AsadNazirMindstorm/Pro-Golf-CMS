@@ -10,12 +10,12 @@
                         <v-item-group selected-class="bg-primary">
                             <v-container>
                                 <v-row>
-                                    <v-col v-for="n in 15" :key="n" cols="12" md="4">
+                                    <v-col v-for="n in tournamentIconsArrays.length" :key="n" cols="12" md="4">
                                         <v-item v-slot="{ isSelected, selectedClass, toggle }">
                                             <v-card :class="['d-flex align-center', selectedClass || n == Number(icon)]"
                                                 height="200" dark @click="() => onIconSelect(toggle, n.toString())">
-                                                <div class="text-h3 flex-grow-1 text-center">
-                                                    <v-img src="../assets/pngwing.com.png"></v-img>
+                                                <div  class="text-h3 flex-grow-1 text-center">
+                                                    <v-img :src="tournamentIconsArrays[n-1].img"></v-img>
                                                 </div>
                                             </v-card>
                                         </v-item>
@@ -36,10 +36,13 @@
 </template>
 
 <script setup lang="ts">
+import { tournamentIconsArrays } from '~/constants/FormConstants';
+
 
 
 const emit = defineEmits(['icon']);
 defineProps({ icon: String });
+
 
 const onIconSelect = (callback: (() => void) | undefined, n: string) => {
     alert("selected is " + n);
