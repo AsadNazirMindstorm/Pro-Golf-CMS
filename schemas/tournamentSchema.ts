@@ -1,8 +1,12 @@
+import type { Meta } from "~/schemas/tournament/metaSchema";
+
 
 interface Tournament
 {
-    
+  metaData:Meta
 }
+
+
 
 export const tournamentSchema = {
   type: "object",

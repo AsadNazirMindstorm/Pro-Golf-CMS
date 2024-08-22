@@ -18,7 +18,7 @@
                 <v-stepper-window>
                     <!-- This is Meta Form -->
                     <v-stepper-window-item :value="1">
-                        <MetaForm />
+                        <MetaForm @meta-form-data-emit="handleMetaDataForm" />
                     </v-stepper-window-item>
                     <!-- This is Holes Form -->
                     <v-stepper-window-item :value="2">
@@ -46,31 +46,41 @@
         </v-stepper>
     </div>
 </template>
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Meta } from '~/schemas/tournament/metaSchema';
 
-<script>
-export default {
-    data() {
-        return {
-            e1: 1,
-            steps: 4,
-            items: [
-                'Meta',
-                'Holes',
-                'Availabitlity',
-                'Submit',
-            ],
-        }
-    },
-    methods: {
-        nextClick: function (callback) {
-            callback();
-        }
-    }
-    ,
-    computed: {
-        disabled() {
-            return this.e1 === 1 ? 'prev' : this.e1 === this.steps ? 'next' : undefined
-        },
-    },
+// Reactive state
+const e1 = ref(1);
+const steps = ref(4);
+const items = ref([
+    'Meta',
+    'Holes',
+    'Availability',
+    'Submit',
+]);
+
+let metaFormData:Meta;
+
+// Methods
+const nextClick = (callback: () => void) => {
+    console.log(metaFormData);
+    callback();
+};
+
+const handleSubmit = () => {
+    // Add your submit logic here
+};
+ 
+//Handling Meta Data form over here
+const handleMetaDataForm = (newMetaFormData:Meta)=>
+{
+    metaFormData = newMetaFormData;
+    console.log(metaFormData);
 }
+
+// Computed properties
+const disabled = computed(() => {
+    return e1.value === 1 ? 'prev' : e1.value === steps.value ? 'next' : undefined;
+});
 </script>

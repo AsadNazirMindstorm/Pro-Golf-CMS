@@ -12,12 +12,10 @@
                                 <v-row>
                                     <v-col v-for="n in 15" :key="n" cols="12" md="4">
                                         <v-item v-slot="{ isSelected, selectedClass, toggle }">
-                                            <v-card :class="['d-flex align-center', selectedClass]" height="200" dark
-                                                @click="() => {
-                                                    onIconSelect(toggle, n.toString());
-                                                }">
+                                            <v-card :class="['d-flex align-center', selectedClass || n == Number(icon)]"
+                                                height="200" dark @click="() => onIconSelect(toggle, n.toString())">
                                                 <div class="text-h3 flex-grow-1 text-center">
-                                                    {{ isSelected ? 'Selected' : 'Click Me!' }}
+                                                    <v-img src="../assets/pngwing.com.png"></v-img>
                                                 </div>
                                             </v-card>
                                         </v-item>
@@ -25,13 +23,11 @@
                                 </v-row>
                             </v-container>
                         </v-item-group>
-
                     </v-form>
                 </v-card-text>
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-
                     <v-btn text="Close Dialog" @click="isActive.value = false"></v-btn>
                 </v-card-actions>
             </v-card>
@@ -39,17 +35,21 @@
     </v-dialog>
 </template>
 
-<script lang="ts">
-export default {
-    data: () => {
+<script setup lang="ts">
 
-    },
-    methods: {
-        onIconSelect: function (callback: (() => void) | undefined, n:string) {
-            alert("selected is "+ n)
-            if (callback !== undefined)
-                callback();
-        }
-    }
-}
+
+const emit = defineEmits(['icon']);
+defineProps({ icon: String });
+
+const onIconSelect = (callback: (() => void) | undefined, n: string) => {
+    alert("selected is " + n);
+
+    // Emitting this value to the parent component
+    emit('icon', n);
+
+    // Calling the built-in callback for this component (toggle)
+    if (callback !== undefined) callback();
+
+
+};
 </script>
