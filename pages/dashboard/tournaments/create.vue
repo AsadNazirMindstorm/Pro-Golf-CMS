@@ -20,20 +20,23 @@
                     <v-stepper-window-item :value="1">
                         <MetaForm @meta-form-data-emit="handleMetaDataForm" />
                     </v-stepper-window-item>
-                    <!-- This is Holes Form -->
+                    <!-- This is Availaibility -->
                     <v-stepper-window-item :value="2">
+                        <AvailabilityForm />
+                    </v-stepper-window-item>
+                    <!-- This is Holes Form -->
+                    <v-stepper-window-item :value="3">
                         <HolesForm />
                     </v-stepper-window-item>
-                    <!-- This is Availaibility -->
-                    <v-stepper-window-item :value="3">
-                        <div>
-                            This is Availabilty
-                        </div>
-                    </v-stepper-window-item>
                     <!-- This is Final Step to save the Data Save Form -->
-                    <v-stepper-window-item :value="3">
-                        <div>
-                            This is Availabilty
+                    <v-stepper-window-item :value="4">
+
+                        <div class="min-h-[300px] flex justify-center items-center flex-col">
+                            <div class="text-xl text-center max-w-[700px] w-[90%] mb-20">
+                                Please check and ensure that you have entered all the data and press confirm and save !
+                            </div>
+                            <v-btn @click="" color="green" prepend-icon="mdi-content-save-check-outline">Confirm and
+                                Save</v-btn>
                         </div>
                     </v-stepper-window-item>
                 </v-stepper-window>
@@ -57,8 +60,8 @@ const e1 = ref(1);
 const steps = ref(4);
 const items = ref([
     'Meta',
-    'Holes',
     'Availability',
+    'Holes',
     'Submit',
 ]);
 

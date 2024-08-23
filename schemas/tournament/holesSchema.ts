@@ -6,7 +6,6 @@ export interface Holes {
   holeData?: Holes[]; //Containing the whole data
 }
 
-
 // Define the interface for hole data
 export interface HoleData {
   courseId: string; // Text field input
@@ -16,10 +15,10 @@ export interface HoleData {
   windDirection: string[]; // Can contain multiple data based on checkboxes
 }
 
-// Hole Data Schema 
+// Hole Data Schema
 const holeDataSchema: JSONSchemaType<HoleData> = {
   type: "object",
-  $id:'#holeDataSchema',
+  $id: "#holeDataSchema",
   properties: {
     courseId: {
       type: "string",
@@ -27,7 +26,7 @@ const holeDataSchema: JSONSchemaType<HoleData> = {
     },
     holeId: {
       type: "number",
-      description: "Hole ID",
+      enum: [1, 2, 4],
     },
     teePosition: {
       type: "number",
@@ -51,45 +50,81 @@ const holeDataSchema: JSONSchemaType<HoleData> = {
   additionalProperties: false,
 };
 
-const holeSchemaForUi={
-  type:"object",
-  properties:{
-    holeCount:{
-      type:"number"
-    }
+const testingHoleScehma: JSONSchemaType<Holes> = {
+  type: "object",
+  properties: {
+    holeCount: {
+      type: "number",
+    },
+    holeData: {
+      type: "array",
+      minItems:0,
+      items: {
+        type: "object",
+        // $id: "#holeDataSchema",
+        properties: {
+          courseId: {
+            type: "string",
+            description: "Course ID",
+          },
+          holeId: {
+            type: "number",
+            enum: [1, 2, 4],
+          },
+          teePosition: {
+            type: "number",
+            description: "Tee position",
+          },
+          windSpeed: {
+            type: "string",
+            enum: ["1", "2", "3"],
+          },
+          windDirection: {
+            type: "array",
+            uniqueItems: true,
+            items: {
+              type: "string",
+              enum: ["foo", "bar", "foobar"], // Define possible values for windDirection
+            },
+            description: "Wind direction options",
+          },
+        },
+        required: ["courseId", "holeId", "teePosition", "windDirection"],
+      },
+    },
   },
-}
+  required: ["holeCount", "holeData"],
+};
+
+const holeSchemaForUi: JSONSchemaType<Holes> = {
+  type: "object",
+  properties: {
+    holeCount: {
+      type: "number",
+    },
+  },
+  required: ["holeCount"],
+};
 
 //New Hole Schema for testing purpose
-const holeSchema:JSONSchemaType<Holes>={
-  type:"object",
-  $id:"#HoleSchema",
-  properties:{
-    holeCount:{
-      type:'number'
+const holeSchema: JSONSchemaType<Holes> = {
+  type: "object",
+  $id: "#HoleSchema",
+  properties: {
+    holeCount: {
+      type: "number",
     },
-    holeData:{
-      type:"array",
-      items:{
-        $ref:'#holeDataSchema'
-      }
-    }
+    holeData: {
+      type: "array",
+      minItems: 0,
+      maxItems:1000,
+      items: {
+        $ref: "#holeDataSchema",
+      },
+    },
   },
-  required:["holeCount",'holeData']
-}
+  required: ["holeCount", "holeData"],
+};
 
-const holeUischema = {
-
-  type: "VertcialLayout",
-  elements: [
-      {
-          type: "Control",
-          scope: "#/properties/holeCount",
-      }
-  ]
-}
-
-
-
-export { holeDataSchema, holeUischema, holeSchemaForUi };
+export { holeDataSchema, holeSchemaForUi, testingHoleScehma };
 export default holeSchema;

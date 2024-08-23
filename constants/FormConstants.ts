@@ -1,3 +1,5 @@
+import type { Availability } from "~/schemas/tournament/availabiltySchema";
+import type { HoleData } from "~/schemas/tournament/holesSchema";
 import type { Meta } from "~/schemas/tournament/metaSchema";
 
 export const defaultMetaFormData: Meta = {
@@ -6,6 +8,23 @@ export const defaultMetaFormData: Meta = {
   icon: "1",
   category: "Chane Me",
 };
+
+export const defaultAvailabiltyFormData:Availability =
+{
+  startDateTime:"12-09-23",
+  endDateTime:"12-09-24",
+  userPlayTime:300,
+  totalTime:600
+
+}
+
+export const defaultHoleData:HoleData={
+    courseId:"Change Me",
+    holeId:-1,
+    teePosition:-1,
+    windDirection:["Change Me"],
+    windSpeed:"Change Me"
+}
 
 export const tournamentIconsArrays: Object[] = [
   { name: "whatever", img: "https://i.ibb.co/wJXZ38g/pngwing-com-1.png" },

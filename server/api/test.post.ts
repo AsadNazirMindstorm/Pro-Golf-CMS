@@ -1,15 +1,15 @@
 import Ajv from "ajv";
-import {
+import holeSchema, {
   holeDataSchema,
   Holes,
-  newHoleSchema,
+  testingHoleScehma,
 } from "~/schemas/tournament/holesSchema";
 
-const ajv = new Ajv({schemas:[newHoleSchema,holeDataSchema]});
+const ajv = new Ajv();
 
 export default defineEventHandler(async (event) => {
   // Read the request body
-  const validate = ajv.compile(newHoleSchema);
+  const validate = ajv.compile(testingHoleScehma);
 
   const body: Holes = await readBody(event);
   try {
