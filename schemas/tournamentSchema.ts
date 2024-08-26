@@ -1,73 +1,13 @@
 import type { Meta } from "~/schemas/tournament/metaSchema";
+import type { Availability } from "./tournament/availabiltySchema";
+import type { Holes } from "./tournament/holesSchema";
 
 
-interface Tournament
+export interface Tournament
 {
   metaData:Meta
+  availabiltyData:Availability
+  holeData:Holes
 }
 
 
-
-export const tournamentSchema = {
-  type: "object",
-  properties: {
-    firstName: {
-      type: "string",
-      minLength: 3,
-      description: "Please enter your first name",
-    },
-    secondName: {
-      type: "string",
-      minLength: 3,
-      description: "Please enter your second name",
-    },
-    vegetarian: {
-      type: "boolean",
-    },
-    birthDate: {
-      type: "string",
-      format: "date",
-      description: "Please enter your birth date.",
-    },
-    nationality: {
-      type: "string",
-      enum: ["DE", "IT", "JP", "US", "RU", "Other"],
-    },
-    provideAddress: {
-      type: "boolean",
-    },
-    address: {
-      type: "object",
-      properties: {
-        street: {
-          type: "string",
-        },
-        streetNumber: {
-          type: "string",
-        },
-        city: {
-          type: "string",
-        },
-        postalCode: {
-          type: "string",
-          maxLength: 5,
-        },
-      },
-    },
-    vegetarianOptions: {
-      type: "object",
-      properties: {
-        vegan: {
-          type: "boolean",
-        },
-        favoriteVegetable: {
-          type: "string",
-          enum: ["Tomato", "Potato", "Salad", "Aubergine", "Cucumber", "Other"],
-        },
-        otherFavoriteVegetable: {
-          type: "string",
-        },
-      },
-    },
-  },
-};

@@ -3,7 +3,7 @@ import { type JSONSchemaType } from "ajv";
 //interfaces
 export interface Holes {
   holeCount: number; // Containing the whole number
-  holeData: Holes[]; //Containing the whole data
+  holeData: HoleData[]; //Containing the whole data
 }
 
 // Define the interface for hole data

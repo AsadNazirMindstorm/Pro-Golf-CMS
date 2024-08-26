@@ -29,7 +29,7 @@
                     </v-stepper-window-item>
                     <!-- This is Holes Form -->
                     <v-stepper-window-item :value="3">
-                        <HolesForm @hole-form-emit="handleHoleForm"/>
+                        <HolesForm @hole-form-emit="handleHoleForm" />
                     </v-stepper-window-item>
                     <!-- This is Final Step to save the Data Save Form -->
                     <v-stepper-window-item :value="4">
@@ -38,7 +38,8 @@
                             <div class="text-xl text-center max-w-[700px] w-[90%] mb-20">
                                 Please check and ensure that you have entered all the data and press confirm and save !
                             </div>
-                            <v-btn @click="" color="green" prepend-icon="mdi-content-save-check-outline">Confirm and
+                            <v-btn @click="handleSubmit" :loading="isLoading" size="large"
+                                color="green" prepend-icon="mdi-content-save-check-outline">Confirm and
                                 Save</v-btn>
                         </div>
                     </v-stepper-window-item>
@@ -55,12 +56,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import AvailabilityForm from '~/components/AvailabilityForm.vue';
+import HoleDataForm from '~/components/HoleDataForm.vue';
 import { useAjv } from '~/composable/Ajv';
 import { defaultAvailabiltyFormData, defaultHoleData, defaultMetaFormData, defualtHoleFormData } from '~/constants/FormConstants';
 import { AvailabilitySchema, type Availability } from '~/schemas/tournament/availabiltySchema';
 import { holeDataSchema, testingHoleScehma, type Holes } from '~/schemas/tournament/holesSchema';
 import type { Meta } from '~/schemas/tournament/metaSchema';
 import metaSchema from '~/schemas/tournament/metaSchema';
+import type { Tournament } from '~/schemas/tournamentSchema';
 
 // Reactive state
 const e1 = ref(1);
@@ -72,12 +75,18 @@ const items = ref([
     'Submit',
 ]);
 
+//generating random UUID to uniquley identify it
+const category = crypto.randomUUID();
+
 
 //assigning default data will be put inside a the load data fucntion
 let metaFormData = ref<Meta>(defaultMetaFormData);
 let availabiltyFormData = ref<Availability>(defaultAvailabiltyFormData);
 let holeFormData = ref<Holes>(defualtHoleFormData);
+let isSaveAndConfirmDisabled = ref(false);
+let isLoading = ref<boolean>(false);
 
+metaFormData.value.category = category;
 // Methods
 const nextClick = (callback: () => void) => {
     let isValid = false;
@@ -103,8 +112,47 @@ const nextClick = (callback: () => void) => {
 };
 
 //This is Final Submit at last stage
-const handleSubmit = () => {
+const handleSubmit =  async () => {
+    isLoading.value = true;
+
+    if (!useAjv().validate(metaSchema, metaFormData.value)) {
+        alert("Meta Data is not correct");
+        return;
+    }
+    else if (!useAjv().validate(AvailabilitySchema, availabiltyFormData.value)) {
+        alert("Availabilty Data is not correct");
+        return;
+    }
+    else if (!useAjv().validate(testingHoleScehma, holeFormData.value)) {
+        alert("Hole Data is not Correct");
+        return;
+    }
     // Add your submit logic here
+
+    //New Object Having All tournament properties
+    let tournament: Tournament = {
+        metaData: metaFormData.value,
+        holeData: holeFormData.value,
+        availabiltyData: availabiltyFormData.value
+    };
+
+    //Final Object
+    console.log(tournament);
+    alert("Saved Succesfully");
+
+    isLoading.value = false;
+
+    //Backend fetch Call to save the data
+
+    const res = await $fetch('/api/test',{
+        method:'POST',
+        body:JSON.stringify(tournament)
+    })
+
+    console.log(res.payload);
+
+    
+
 };
 
 //Handling Meta Data form over here

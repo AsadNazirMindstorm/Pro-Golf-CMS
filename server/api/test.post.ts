@@ -8,26 +8,29 @@ import holeSchema, {
 const ajv = new Ajv();
 
 export default defineEventHandler(async (event) => {
-  // Read the request body
-  const validate = ajv.compile(testingHoleScehma);
 
   const body: Holes = await readBody(event);
   try {
-    if (validate == undefined)
-      return { status: "Failed validate was undefined" };
+    // if (validate == undefined)
+    //   return { status: "Failed validate was undefined" };
 
-    if (validate(body)) {
-      return {
-        status: "success",
-        payload: body,
-      };
-    } else {
-      setResponseStatus(event, 500, "Invalid Payload");
-      return {
-        status: "failed",
-        payload: body,
-      };
-    }
+    // if (validate(body)) {
+    //   return {
+    //     status: "success",
+    //     payload: body,
+    //   };
+    // } else {
+    //   setResponseStatus(event, 500, "Invalid Payload");
+    //   return {
+    //     status: "failed",
+    //     payload: body,
+    //   };
+    // }
+
+    return {
+      status: "success",
+      payload: body,
+    };
   } catch (e: any) {
     console.log(e);
     return {
