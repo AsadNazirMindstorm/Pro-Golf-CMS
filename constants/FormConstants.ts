@@ -1,5 +1,5 @@
 import type { Availability } from "~/schemas/tournament/availabiltySchema";
-import type { HoleData } from "~/schemas/tournament/holesSchema";
+import type { HoleData, Holes } from "~/schemas/tournament/holesSchema";
 import type { Meta } from "~/schemas/tournament/metaSchema";
 
 export const defaultMetaFormData: Meta = {
@@ -11,18 +11,22 @@ export const defaultMetaFormData: Meta = {
 
 export const defaultAvailabiltyFormData:Availability =
 {
-  startDateTime:"12-09-23",
-  endDateTime:"12-09-24",
+  startDateTime:"2019-08-22T15:30:00Z",
+  endDateTime:"2020-08-22T15:30:00Z",
   userPlayTime:300,
   totalTime:600
+}
 
+export const defualtHoleFormData:Holes ={
+  holeCount:-1,
+  holeData:[]
 }
 
 export const defaultHoleData:HoleData={
     courseId:"Change Me",
     holeId:-1,
     teePosition:-1,
-    windDirection:["Change Me"],
+    windDirection:[],
     windSpeed:"Change Me"
 }
 

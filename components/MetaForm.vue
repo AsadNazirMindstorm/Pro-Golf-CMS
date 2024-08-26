@@ -11,7 +11,7 @@
             <!-- --------------------------- -->
             <edit-icon :icon="data.icon" @icon="handleIconChange" />
             <div class="w-full">
-                <v-img style="width: 70%;":src="tournamentIconsArrays[Number(data.icon)-1].img"></v-img>
+                <v-img style="width: 70%;" :src="tournamentIconsArrays[Number(data.icon) - 1].img"></v-img>
             </div>
         </div>
     </div>
@@ -36,6 +36,9 @@ const uischema = {
         {
             type: 'Control',
             scope: '#/properties/category',
+            options: {
+                readonly: true
+            }
         },
         {
             type: 'Control',

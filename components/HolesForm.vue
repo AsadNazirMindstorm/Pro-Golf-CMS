@@ -1,6 +1,6 @@
 <template>
     <div class="lg:w-[50%]">
-        <json-forms :data="data" :renderers="renderers" :schema="schema" :uischema="uischema" @change="onChange" />
+        <json-forms :data="holeDataForForm" :renderers="renderers" :schema="schema" :uischema="uischema" @change="onChange" />
     </div>
     <div class="flex justify-between mb-8 mt-4">
         <h1 class="lg:text-2xl font-semibold">Holes</h1>
@@ -23,11 +23,14 @@
         </div>
     </div>
 </template>
+
+
 <script setup lang="ts">
 import { ref, computed, watch, defineComponent } from 'vue';
 import { JsonForms } from '@jsonforms/vue';
 import { defaultStyles, mergeStyles, vuetifyRenderers } from '@jsonforms/vue-vuetify';
-import holeDataSchema, { holeSchemaForUi, testingHoleScehma } from '~/schemas/tournament/holesSchema';
+import holeDataSchema, { holeSchemaForUi, testingHoleScehma, type HoleData, type Holes } from '~/schemas/tournament/holesSchema';
+import { defualtHoleFormData } from '~/constants/FormConstants';
 
 // Reactive state
 const page = ref(1);
@@ -52,23 +55,12 @@ const uischema = {
     ],
 };
 
+//This is only for hole count
+
+const holeDataForForm= ref<Holes>(defualtHoleFormData);
+
 // Form data
-const data = ref([
-    {
-        courseId: 'Some Course',
-        holeId: 1,
-        teePosition: 12,
-        windSpeed: '1',
-        windDirection: ['right', 'left'],
-    },
-    {
-        courseId: 'Santa fe',
-        holeId: 1,
-        teePosition: 12,
-        windSpeed: '1',
-        windDirection: ['right', 'left'],
-    },
-]);
+const data = ref(defualtHoleFormData.holeData);
 
 // Renderer and styles
 const renderers = Object.freeze([...vuetifyRenderers]);
@@ -83,13 +75,19 @@ const headers = [
     { title: 'Wind Direction', key: 'windDirection', align: 'end' },
 ];
 
+// emit for Hole data to parent
+
+const emit = defineEmits(['holeFormEmit']);
+
 // Methods
 const onChange = (event: { data: any }) => {
-    data.value = event.data;
+    holeDataForForm.value = event.data;
+    emit('holeFormEmit',holeDataForForm.value);
 };
 
 const handleHoleDataEmit = (newHoleFormData: any) => {
     console.log(newHoleFormData);
+    holeDataForForm.value.holeData = data.value;
     data.value.push(newHoleFormData); // Add new data to the form data array
     // After adding the new data, reload the items in the table
     loadItems({ page: page.value, itemsPerPage: itemsPerPage.value, sortBy: '' });

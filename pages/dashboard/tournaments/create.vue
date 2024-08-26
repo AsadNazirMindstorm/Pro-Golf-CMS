@@ -1,6 +1,9 @@
 <template>
     <div class="flex justify-between mb-8 mt-4">
-        <h1 class="lg:text-3xl font-semibold">Create Tournament</h1>
+        <div>
+            <h1 class="lg:text-3xl font-semibold">Create Tournament</h1>
+            <h1 class="lg:text-lg mt-4">Tournament Title # {{ metaFormData.title }}</h1>
+        </div>
         <paste-tournament />
     </div>
     <div>
@@ -22,11 +25,11 @@
                     </v-stepper-window-item>
                     <!-- This is Availaibility -->
                     <v-stepper-window-item :value="2">
-                        <AvailabilityForm />
+                        <AvailabilityForm @-availabilty-form-data-emit="handleAvailabilityForm" />
                     </v-stepper-window-item>
                     <!-- This is Holes Form -->
                     <v-stepper-window-item :value="3">
-                        <HolesForm />
+                        <HolesForm @hole-form-emit="handleHoleForm"/>
                     </v-stepper-window-item>
                     <!-- This is Final Step to save the Data Save Form -->
                     <v-stepper-window-item :value="4">
@@ -51,7 +54,11 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import AvailabilityForm from '~/components/AvailabilityForm.vue';
 import { useAjv } from '~/composable/Ajv';
+import { defaultAvailabiltyFormData, defaultHoleData, defaultMetaFormData, defualtHoleFormData } from '~/constants/FormConstants';
+import { AvailabilitySchema, type Availability } from '~/schemas/tournament/availabiltySchema';
+import { holeDataSchema, testingHoleScehma, type Holes } from '~/schemas/tournament/holesSchema';
 import type { Meta } from '~/schemas/tournament/metaSchema';
 import metaSchema from '~/schemas/tournament/metaSchema';
 
@@ -65,32 +72,55 @@ const items = ref([
     'Submit',
 ]);
 
-let metaFormData: Meta;
+
+//assigning default data will be put inside a the load data fucntion
+let metaFormData = ref<Meta>(defaultMetaFormData);
+let availabiltyFormData = ref<Availability>(defaultAvailabiltyFormData);
+let holeFormData = ref<Holes>(defualtHoleFormData);
 
 // Methods
 const nextClick = (callback: () => void) => {
-
+    let isValid = false;
     //Meta form data validation
     if (e1.value == 1) {
-        const isValid = useAjv().validate(metaSchema, metaFormData);
-        if (!isValid) {
-            alert("Please Enter Correct data");
-            return;
-        }
-        callback();
+        isValid = useAjv().validate(metaSchema, metaFormData.value);
 
     }
-    console.log(metaFormData);
+    else if (e1.value == 2) {
+        console.log(availabiltyFormData.value);
+        isValid = useAjv().validate(AvailabilitySchema, availabiltyFormData.value);
+    }
+    else if (e1.value == 3) {
+        isValid = useAjv().validate(testingHoleScehma, holeFormData.value);
+    }
+
+    if (!isValid) {
+        alert("Please Enter Correct data");
+        return;
+    }
+
+    callback();
 };
 
+//This is Final Submit at last stage
 const handleSubmit = () => {
     // Add your submit logic here
 };
 
 //Handling Meta Data form over here
 const handleMetaDataForm = (newMetaFormData: Meta) => {
-    metaFormData = newMetaFormData;
-    //console.log(metaFormData);
+    metaFormData.value = newMetaFormData;
+}
+
+//Handle Availabilty Form Data over here
+const handleAvailabilityForm = (newAvailableFormData: Availability) => {
+    availabiltyFormData.value = newAvailableFormData;
+}
+
+//Handle Hole Form Data over here
+const handleHoleForm = (newHoleFormData: Holes) => {
+    holeFormData.value = newHoleFormData;
+    console.log(holeFormData.value);
 }
 
 // Computed properties

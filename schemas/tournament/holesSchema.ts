@@ -3,7 +3,7 @@ import { type JSONSchemaType } from "ajv";
 //interfaces
 export interface Holes {
   holeCount: number; // Containing the whole number
-  holeData?: Holes[]; //Containing the whole data
+  holeData: Holes[]; //Containing the whole data
 }
 
 // Define the interface for hole data
@@ -55,6 +55,7 @@ const testingHoleScehma: JSONSchemaType<Holes> = {
   properties: {
     holeCount: {
       type: "number",
+      minimum:1
     },
     holeData: {
       type: "array",

@@ -14,8 +14,9 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="green" @click="handleHoleDataSubmit">Save</v-btn>
-                    <v-btn text="Close Dialog" @click="() => { data = defaultHoleData; isActive.value = false }"></v-btn>
+                    <v-btn :disabled="isSaveDisabled" color="green" @click="handleHoleDataSubmit(isActive)">Save</v-btn>
+                    <v-btn text="Close Dialog"
+                        @click="() => { data = defaultHoleData; isActive.value = false }"></v-btn>
                 </v-card-actions>
             </v-card>
         </template>
@@ -29,6 +30,7 @@ import { defaultStyles, mergeStyles, vuetifyRenderers } from '@jsonforms/vue-vue
 import { holeDataSchema } from '~/schemas/tournament/holesSchema';
 import { type HoleData } from '~/schemas/tournament/holesSchema';
 import { defaultHoleData } from '~/constants/FormConstants';
+import { useAjv } from '~/composable/Ajv';
 
 // Define the renderers and schema
 const renderers = Object.freeze([...vuetifyRenderers]);
@@ -70,14 +72,30 @@ const uischema = {
     ]
 };
 
+const isSaveDisabled = ref(true);
+
+
 const onChange = (event: JsonFormsChangeEvent) => {
     data.value = event.data;
+    const isValid = useAjv().validate(holeDataSchema, data.value);
+
+    if (isValid) isSaveDisabled.value = false;
+
 }
 
-const handleHoleDataSubmit = () => {
+const handleHoleDataSubmit = (closeDialougue: globalThis.Ref<boolean>) => {
+
+    const isValid = useAjv().validate(holeDataSchema, data.value);
+    if (!isValid) {
+        alert("Please Enter the correct data !");
+        return;
+    };
     console.log(data.value);
+
     //Emmitting the Data to the Parent
     emit("holeDataEmit", data.value);
+    closeDialougue.value = false;
+
 }
 
 

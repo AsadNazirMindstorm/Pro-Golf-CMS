@@ -1,7 +1,12 @@
 import Ajv from "ajv"
+import addFormats from "ajv-formats";
+
 
 // Initialize AJV instance
 const ajv = new Ajv();
+
+//add date-time formats
+addFormats(ajv,['date-time']);
 
 // Define a composable function to validate data against a schema
 export function useAjv() {

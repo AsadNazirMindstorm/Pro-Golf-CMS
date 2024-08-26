@@ -66,8 +66,13 @@ const uischema = {
     ]
 }
 
+const emit =  defineEmits(['AvailabiltyFormDataEmit']);
+
 const onChange = (event: JsonFormsChangeEvent) => {
     data.value = event.data;
+
+    //Emitting the data to the parent
+    emit('AvailabiltyFormDataEmit', data.value);
 
     availabilityFormData = data.value;
 }
