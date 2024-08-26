@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
       // payload: res,
     };
   } catch (e: any) {
-    console.log(e);
+    // console.log(e);
     return {
       status: "failed",
       message: e,

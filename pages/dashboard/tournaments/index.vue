@@ -30,11 +30,17 @@
                     contain></v-img>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon class="me-2" size="large" @click="">
+                <v-icon class="me-2" size="small" @click="">
                     mdi-pencil
                 </v-icon>
-                <v-icon size="large" @click="">
+                <v-icon class="me-2" size="small" @click="handleDelete(item)">
                     mdi-delete
+                </v-icon>
+                <v-icon class="me-2" size="small" @click="handleCopy(item)">
+                    mdi-content-copy
+                </v-icon>
+                <v-icon size="small" @click="handleDuplicate(item)">
+                    mdi-content-duplicate
                 </v-icon>
             </template>
         </v-data-table-server>
@@ -46,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+import { JsonForms } from '@jsonforms/vue';
 import { tournamentIconsArrays } from '~/constants/FormConstants';
 import type { ServerResponse } from '~/schemas/responseSchema';
 import { type Tournament } from '~/schemas/tournamentSchema';
@@ -138,7 +145,8 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: { page: number, itemsPe
                 league: element.metaData.league,
                 createdAt: element.createdAt ? element.createdAt : " ",
                 updatedAt: element.updatedAt ? element.updatedAt : " ",
-                name: tournamentIconsArrays[Number(element.metaData.icon) - 1].name
+                name: tournamentIconsArrays[Number(element.metaData.icon) - 1].name,
+                completeObject: element
             }
             itemsForDisplay.value.push(tempObj);
         });
@@ -150,11 +158,67 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: { page: number, itemsPe
     }
 };
 
+const handleDuplicate = async (item: any) => {
+    try {
+        const serverResponse: ServerResponse = await $fetch('/api/copyTournament', {
+            method: 'POST',
+            body: JSON.stringify(item.completeObject)
+        })
+
+        if (serverResponse.success) {
+            alert("Created a copy succesfully");
+            await loadItems({
+                page: 1, // Assuming you want to start from the first page
+                itemsPerPage: itemsPerPage.value,
+                sortBy: [] // Adjust sorting if needed
+            });
+        }
+        else {
+            alert("Error Occurred");
+        }
+    }
+    catch (error: any) {
+        alert("Error Occurred")
+    }
+}
 
 //Delete and edit handler
-const handleDelete = (item:any) =>
-{
-    alert("Delete is pressed");
+const handleDelete = async (item: any) => {
+    try {
+        console.log(item);
+        const serverResponse: ServerResponse = await $fetch('/api/deleteTournament', {
+            method: 'DELETE',
+            body: JSON.stringify({
+                id: item.tournamentId
+            })
+        })
+
+        if (serverResponse.success) {
+            alert('deleted successfully');
+            await loadItems({
+                page: 1, // Assuming you want to start from the first page
+                itemsPerPage: itemsPerPage.value,
+                sortBy: [] // Adjust sorting if needed
+            });
+        }
+        else {
+            alert("error occurred");
+        }
+
+    }
+    catch (error: any) {
+
+    }
+}
+
+const handleCopy = async (item: any) => {
+    try {
+        await navigator.clipboard.writeText(JSON.stringify(item.completeObject));
+        alert('copied successfully');
+    }
+    catch (error: any) {
+        alert("Error occured");
+    }
 }
 
 // Watcher for tournaments changes

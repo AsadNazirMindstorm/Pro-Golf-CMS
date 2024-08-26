@@ -9,7 +9,7 @@ class tournamentDAO {
       // Query to get tournament data with nested hole data
       const results = await db.raw(`
        SELECT
-        t.tournament_id AS "metaData.id",
+        t.id AS "metaData.id",
         t.title AS "metaData.title",
         t.league AS "metaData.league",
         t.icon AS "metaData.icon",
@@ -38,7 +38,7 @@ class tournamentDAO {
       // Transform the raw results into the nested JSON format
       return results.rows.map((row: { [x: string]: any }) => ({
         metaData: {
-          id: row["metaData.id"],
+          category: row["metaData.id"],
           title: row["metaData.title"],
           league: row["metaData.league"],
           icon: row["metaData.icon"],
@@ -56,6 +56,34 @@ class tournamentDAO {
         createdAt: row["createdAt"],
         updatedAt: row["updatedAt"],
       }));
+    } catch (error: any) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async deleteTournament(id: string) {
+    try {
+      console.log(id);
+      const res = await db
+        .table(TOURNAMENT_TABLE_NAME)
+        .del()
+        .where("id", "=", id); // deleting on the basis of UUID
+
+      return res;
+    } catch (error: any) {
+      throw error;
+    }
+  }
+
+  async createCopy(tournament: Tournament) {
+    try {
+      //create a new UUID for this
+      tournament.metaData.category = crypto.randomUUID();
+
+      //use the already defined function again to craete the copy
+      const id = await this.insertTournament(tournament);
+      return id;
     } catch (error: any) {
       console.log(error);
       throw error;
