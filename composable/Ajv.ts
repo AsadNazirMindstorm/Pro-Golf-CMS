@@ -1,9 +1,11 @@
 import Ajv from "ajv"
 import addFormats from "ajv-formats";
+import holeSchema, { holeDataSchema } from "~/schemas/tournament/holesSchema";
 
 
 // Initialize AJV instance
-const ajv = new Ajv();
+const ajv = new Ajv().addSchema([holeDataSchema, holeSchema]);
+
 
 //add date-time formats
 addFormats(ajv,['date-time']);

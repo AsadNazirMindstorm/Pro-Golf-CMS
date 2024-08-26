@@ -38,8 +38,8 @@
                             <div class="text-xl text-center max-w-[700px] w-[90%] mb-20">
                                 Please check and ensure that you have entered all the data and press confirm and save !
                             </div>
-                            <v-btn @click="handleSubmit" :loading="isLoading" size="large"
-                                color="green" prepend-icon="mdi-content-save-check-outline">Confirm and
+                            <v-btn @click="handleSubmit" :loading="isLoading" size="large" color="green"
+                                prepend-icon="mdi-content-save-check-outline">Confirm and
                                 Save</v-btn>
                         </div>
                     </v-stepper-window-item>
@@ -59,6 +59,7 @@ import AvailabilityForm from '~/components/AvailabilityForm.vue';
 import HoleDataForm from '~/components/HoleDataForm.vue';
 import { useAjv } from '~/composable/Ajv';
 import { defaultAvailabiltyFormData, defaultHoleData, defaultMetaFormData, defualtHoleFormData } from '~/constants/FormConstants';
+import type { ServerResponse } from '~/schemas/responseSchema';
 import { AvailabilitySchema, type Availability } from '~/schemas/tournament/availabiltySchema';
 import { holeDataSchema, testingHoleScehma, type Holes } from '~/schemas/tournament/holesSchema';
 import type { Meta } from '~/schemas/tournament/metaSchema';
@@ -112,7 +113,7 @@ const nextClick = (callback: () => void) => {
 };
 
 //This is Final Submit at last stage
-const handleSubmit =  async () => {
+const handleSubmit = async () => {
     isLoading.value = true;
 
     if (!useAjv().validate(metaSchema, metaFormData.value)) {
@@ -138,21 +139,21 @@ const handleSubmit =  async () => {
 
     //Final Object
     console.log(tournament);
-    alert("Saved Succesfully");
-
-    isLoading.value = false;
 
     //Backend fetch Call to save the data
-
-    const res = await $fetch('/api/test',{
-        method:'POST',
-        body:JSON.stringify(tournament)
+    const res: ServerResponse = await $fetch('/api/insertTournament', {
+        method: 'POST',
+        body: JSON.stringify(tournament)
     })
 
-    console.log(res.payload);
+    if (res.success)
+        alert("Inserted successfully");
+    else {
+        alert("Error occured");
+        console.log(res.message);
+    }
 
-    
-
+    isLoading.value = false;
 };
 
 //Handling Meta Data form over here

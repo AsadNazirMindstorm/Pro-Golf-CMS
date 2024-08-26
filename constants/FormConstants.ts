@@ -30,7 +30,13 @@ export const defaultHoleData:HoleData={
     windSpeed:"Change Me"
 }
 
-export const tournamentIconsArrays: Object[] = [
+export interface iconsArray
+{
+  name:string,
+  img:string
+}
+
+export const tournamentIconsArrays: iconsArray[] = [
   { name: "whatever", img: "https://i.ibb.co/wJXZ38g/pngwing-com-1.png" },
   {
     name: "whatever",

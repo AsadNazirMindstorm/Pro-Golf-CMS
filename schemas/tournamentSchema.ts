@@ -8,6 +8,8 @@ export interface Tournament
   metaData:Meta
   availabiltyData:Availability
   holeData:Holes
+  createdAt?:string
+  updatedAt?:string
 }
 
 

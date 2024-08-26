@@ -1,6 +1,6 @@
 export interface ServerResponse
 {
     success:boolean
-    message?:string
+    message?:any
     data?:any
 }
