@@ -101,7 +101,7 @@ const nextClick = (callback: () => void) => {
         isValid = useAjv().validate(AvailabilitySchema, availabiltyFormData.value);
     }
     else if (e1.value == 3) {
-        isValid = useAjv().validate(testingHoleScehma, holeFormData.value);
+        isValid = useAjv().validateHoleForm(holeFormData.value);
     }
 
     if (!isValid) {

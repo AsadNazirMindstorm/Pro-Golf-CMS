@@ -4,6 +4,7 @@ import { type JSONSchemaType } from "ajv";
 export interface Holes {
   holeCount: number; // Containing the whole number
   holeData: HoleData[]; //Containing the whole data
+  isRandom: boolean;
 }
 
 // Define the interface for hole data
@@ -55,11 +56,15 @@ const testingHoleScehma: JSONSchemaType<Holes> = {
   properties: {
     holeCount: {
       type: "number",
-      minimum:1
+      minimum: 1,
+    },
+    isRandom: {
+      type: "boolean",
+      default: false,
     },
     holeData: {
       type: "array",
-      minItems:0,
+      minItems: 0,
       items: {
         type: "object",
         // $id: "#holeDataSchema",
@@ -103,6 +108,10 @@ const holeSchemaForUi: JSONSchemaType<Holes> = {
     holeCount: {
       type: "number",
     },
+    isRandom: {
+      type: "boolean",
+      default: false,
+    },
   },
   required: ["holeCount"],
 };
@@ -118,7 +127,7 @@ const holeSchema: JSONSchemaType<Holes> = {
     holeData: {
       type: "array",
       minItems: 0,
-      maxItems:1000,
+      maxItems: 1000,
       items: {
         $ref: "#holeDataSchema",
       },

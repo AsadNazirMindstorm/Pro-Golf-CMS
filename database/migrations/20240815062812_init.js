@@ -15,6 +15,7 @@ exports.up = function (knex) {
       table.integer("total_play_time").notNullable(); // Total play time
       table.integer("hole_count").notNullable(); // Number of holes
       table.string("icon");
+      table.boolean('isRandom').notNullable();
       table.timestamps(true, true); // Created at and updated at timestamps
     })
     .createTable("hole_data_table", function (table) {

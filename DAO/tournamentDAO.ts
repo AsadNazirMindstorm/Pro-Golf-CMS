@@ -18,6 +18,7 @@ class tournamentDAO {
         t.total_play_time AS "availabiltyData.totalTime",
         t.user_play_time AS "availabiltyData.userPlayTime",
         t.hole_count AS "holeData.holeCount",
+        t.is_random AS "holeData.isRandom",
         t.created_at AS "createdAt",
         t.updated_at AS "updatedAt",
         json_agg(
@@ -50,6 +51,7 @@ class tournamentDAO {
           userPlayTime: row["availabiltyData.userPlayTime"],
         },
         holeData: {
+          isRandom:row["holeData.isRandom"],
           holeCount: row["holeData.holeCount"],
           holeData: row["holeData.holeData"],
         },
@@ -105,6 +107,7 @@ class tournamentDAO {
           user_play_time: tournament.availabiltyData.userPlayTime,
           total_play_time: tournament.availabiltyData.totalTime,
           hole_count: tournament.holeData.holeCount,
+          is_random: tournament.holeData.isRandom,
         })
         .returning("tournament_id");
 

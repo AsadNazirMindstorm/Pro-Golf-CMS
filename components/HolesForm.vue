@@ -1,10 +1,11 @@
 <template>
     <div class="lg:w-[50%]">
-        <json-forms :data="holeDataForForm" :renderers="renderers" :schema="schema" :uischema="uischema" @change="onChange" />
+        <json-forms :data="holeDataForForm" :renderers="renderers" :schema="schema" :uischema="uischema"
+            @change="onChange" />
     </div>
     <div class="flex justify-between mb-8 mt-4">
         <h1 class="lg:text-2xl font-semibold">Holes</h1>
-        <hole-data-form @hole-data-emit="handleHoleDataEmit" />
+        <hole-data-form :is-created-disabled="isCreateDisabled" @hole-data-emit="handleHoleDataEmit" />
     </div>
     <div class="holesTable">
         <div class="searchBar outline-1 w-[70%] my-8 flex items-center">
@@ -42,22 +43,27 @@ const loading = ref(true);
 const totalItems = ref(0);
 const selectAll = ref(false);
 const selected = ref([]);
+const isCreateDisabled = ref<boolean>(true);
 
 // Schema and UI schema
 const schema = testingHoleScehma;
 const uischema = {
-    type: 'VerticalLayout',
+    type: 'HorizontalLayout',
     elements: [
         {
             type: 'Control',
             scope: '#/properties/holeCount',
         },
+        {
+            type: 'Control',
+            scope: '#/properties/isRandom'
+        }
     ],
 };
 
 //This is only for hole count
 
-const holeDataForForm= ref<Holes>(defualtHoleFormData);
+const holeDataForForm = ref<Holes>(defualtHoleFormData);
 
 // Form data
 const data = ref(defualtHoleFormData.holeData);
@@ -76,13 +82,22 @@ const headers = [
 ];
 
 // emit for Hole data to parent
-
 const emit = defineEmits(['holeFormEmit']);
 
 // Methods
 const onChange = (event: { data: any }) => {
+
+
     holeDataForForm.value = event.data;
-    emit('holeFormEmit',holeDataForForm.value);
+    console.log('count', holeDataForForm.value.holeCount);
+
+    //disabling the create when the value is less than 1
+    if (holeDataForForm.value.holeCount !== undefined && holeDataForForm.value.holeCount > 0)
+        isCreateDisabled.value = false;
+
+    else isCreateDisabled.value = true;
+
+    emit('holeFormEmit', holeDataForForm.value);
 };
 
 const handleHoleDataEmit = (newHoleFormData: any) => {

@@ -9,31 +9,30 @@ export const defaultMetaFormData: Meta = {
   category: "Chane Me",
 };
 
-export const defaultAvailabiltyFormData:Availability =
-{
-  startDateTime:"2019-08-22T15:30:00Z",
-  endDateTime:"2020-08-22T15:30:00Z",
-  userPlayTime:300,
-  totalTime:600
-}
+export const defaultAvailabiltyFormData: Availability = {
+  startDateTime: "2019-08-22T15:30:00Z",
+  endDateTime: "2020-08-22T15:30:00Z",
+  userPlayTime: 300,
+  totalTime: 600,
+};
 
-export const defualtHoleFormData:Holes ={
-  holeCount:-1,
-  holeData:[]
-}
+export const defualtHoleFormData: Holes = {
+  holeCount: -1,
+  isRandom: false,
+  holeData: [],
+};
 
-export const defaultHoleData:HoleData={
-    courseId:"Change Me",
-    holeId:-1,
-    teePosition:-1,
-    windDirection:[],
-    windSpeed:"Change Me"
-}
+export const defaultHoleData: HoleData = {
+  courseId: "Change Me",
+  holeId: -1,
+  teePosition: -1,
+  windDirection: [],
+  windSpeed: "Change Me",
+};
 
-export interface iconsArray
-{
-  name:string,
-  img:string
+export interface iconsArray {
+  name: string;
+  img: string;
 }
 
 export const tournamentIconsArrays: iconsArray[] = [

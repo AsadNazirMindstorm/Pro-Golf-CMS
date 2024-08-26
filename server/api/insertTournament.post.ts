@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     }
     if (!useAjv().validate(AvailabilitySchema, body.availabiltyData))
       throw new Error("Availabilty Data is not correct");
-    if (!useAjv().validate(holeSchema, body.holeData))
+    if (!useAjv().validateHoleForm(body.holeData))
       throw new Error("Hole Data is not correct");
 
     //returning the id after inserting
@@ -31,6 +31,8 @@ export default defineEventHandler(async (event) => {
       data: id,
     });
   } catch (error: any) {
+    setResponseStatus(event, 503);
+    console.log(error);
     //error response
     return (serverResponse = {
       success: false,
