@@ -30,7 +30,7 @@
                     contain></v-img>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon class="me-2" size="small" @click="">
+                <v-icon class="me-2" size="small" @click="handleEdit(item)">
                     mdi-pencil
                 </v-icon>
                 <v-icon class="me-2" size="small" @click="handleDelete(item)">
@@ -210,6 +210,13 @@ const handleDelete = async (item: any) => {
 
     }
 }
+
+
+const handleEdit = (item: any) => {
+    const router = useRouter();
+    // Navigate to /dashboard/edit/:id with item.uuid
+    router.push('/dashboard/tournaments/edit/'+item.tournamentId);
+};
 
 const handleCopy = async (item: any) => {
     try {

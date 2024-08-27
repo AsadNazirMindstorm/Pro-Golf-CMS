@@ -1,7 +1,8 @@
 <template>
     <v-dialog max-width="500" :close-on-content-click="false">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn v-bind="activatorProps" color="blue" :disabled="isCreatedDisabled" prepend-icon="mdi-plus">Create</v-btn>
+            <v-btn v-bind="activatorProps" color="blue" :disabled="isCreatedDisabled"
+                prepend-icon="mdi-plus">Create</v-btn>
         </template>
         <template v-slot:default="{ isActive }">
             <v-card title="Dialog">
@@ -39,8 +40,7 @@ const schema = holeDataSchema;
 
 const emit = defineEmits(['holeDataEmit']);
 
-let holeDataFormData: HoleData = defaultHoleData;
-let data = ref(holeDataFormData);
+let holeDataFormData = ref<HoleData>(defaultHoleData)
 
 // UI schema for the JSON form
 const uischema = {
@@ -57,6 +57,10 @@ const uischema = {
         {
             type: 'Control',
             scope: '#/properties/windSpeed',
+        },
+        {
+            type: 'Control',
+            scope: '#/properties/teePosition',
         },
         {
             type: "Group",
@@ -76,8 +80,8 @@ const isSaveDisabled = ref(true);
 
 
 const onChange = (event: JsonFormsChangeEvent) => {
-    data.value = event.data;
-    const isValid = useAjv().validate(holeDataSchema, data.value);
+    holeDataFormData.value = event.data;
+    const isValid = useAjv().validate(holeDataSchema, holeDataFormData.value);
 
     if (isValid) isSaveDisabled.value = false;
 
@@ -85,16 +89,17 @@ const onChange = (event: JsonFormsChangeEvent) => {
 
 const handleHoleDataSubmit = (closeDialougue: globalThis.Ref<boolean>) => {
 
-    const isValid = useAjv().validate(holeDataSchema, data.value);
+    const isValid = useAjv().validate(holeDataSchema, holeDataFormData.value);
     if (!isValid) {
         alert("Please Enter the correct data !");
         return;
     };
-    console.log(data.value);
+
 
     //Emmitting the Data to the Parent
-    emit("holeDataEmit", data.value);
+    emit("holeDataEmit", holeDataFormData.value);
     closeDialougue.value = false;
+
 
 }
 

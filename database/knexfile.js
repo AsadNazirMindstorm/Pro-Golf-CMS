@@ -107,4 +107,3 @@ export const production = {
     tableName: "knex_migrations",
   },
 };
-

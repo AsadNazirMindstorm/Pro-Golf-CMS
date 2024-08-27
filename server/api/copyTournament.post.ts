@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       throw new Error("Meta Form Error");
     if (!useAjv().validate(AvailabilitySchema, body.availabiltyData))
       throw new Error("Availabilty Data is wrong");
-    if (!useAjv().validate(holeSchema, body.holeData))
+    if (!useAjv().validateHoleForm(body.holeData))
       throw new Error("Holes are incorrect");
 
     const res = await tournamentDAO.createCopy(body);

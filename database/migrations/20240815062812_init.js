@@ -15,7 +15,7 @@ exports.up = function (knex) {
       table.integer("total_play_time").notNullable(); // Total play time
       table.integer("hole_count").notNullable(); // Number of holes
       table.string("icon");
-      table.boolean('isRandom').notNullable();
+      table.boolean('is_random').notNullable();
       table.timestamps(true, true); // Created at and updated at timestamps
     })
     .createTable("hole_data_table", function (table) {
@@ -26,10 +26,9 @@ exports.up = function (knex) {
       table.specificType("wind_direction", "TEXT[]"); // Array of wind directions
       table.string("wind_speed");
       table
-        .integer("tournament_id")
-        .unsigned()
+        .uuid("tournament_id")
         .notNullable() // Foreign key
-        .references("tournament_id")
+        .references("id")
         .inTable("tournament_table")
         .onDelete("CASCADE"); // On delete cascade
       table.timestamps(true, true); // Created at and updated at timestamps

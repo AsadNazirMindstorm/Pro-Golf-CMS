@@ -32,7 +32,7 @@ class tournamentDAO {
         ) AS "holeData.holeData"
       FROM tournament_table t
       LEFT JOIN hole_data_table h
-      ON t.tournament_id = h.tournament_id
+      ON t.id = h.tournament_id
       GROUP BY t.tournament_id
     `);
 
@@ -51,7 +51,69 @@ class tournamentDAO {
           userPlayTime: row["availabiltyData.userPlayTime"],
         },
         holeData: {
-          isRandom:row["holeData.isRandom"],
+          isRandom: row["holeData.isRandom"],
+          holeCount: row["holeData.holeCount"],
+          holeData: row["holeData.holeData"],
+        },
+        createdAt: row["createdAt"],
+        updatedAt: row["updatedAt"],
+      }));
+    } catch (error: any) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getTournament(id: string) {
+    try {
+      // Query to get tournament data with nested hole data
+      const results = await db.raw(`
+       SELECT
+        t.id AS "metaData.id",
+        t.title AS "metaData.title",
+        t.league AS "metaData.league",
+        t.icon AS "metaData.icon",
+        t.start_datetime AS "availabiltyData.startDateTime",
+        t.end_datetime AS "availabiltyData.endDateTime",
+        t.total_play_time AS "availabiltyData.totalTime",
+        t.user_play_time AS "availabiltyData.userPlayTime",
+        t.hole_count AS "holeData.holeCount",
+        t.is_random AS "holeData.isRandom",
+        t.created_at AS "createdAt",
+        t.updated_at AS "updatedAt",
+        json_agg(
+          json_build_object(
+            'courseId', h.course_id,
+            'holeId', h.hole_id,
+            'teePosition', h.tee_position,
+            'windSpeed', h.wind_speed,
+            'windDirection', h.wind_direction
+          )
+        ) AS "holeData.holeData"
+      FROM tournament_table t
+      LEFT JOIN hole_data_table h
+      ON t.id = h.tournament_id
+      WHERE t.id = '${id}'
+      GROUP BY t.tournament_id
+     
+    `);
+
+      // Transform the raw results into the nested JSON format
+      return results.rows.map((row: { [x: string]: any }) => ({
+        metaData: {
+          category: row["metaData.id"],
+          title: row["metaData.title"],
+          league: row["metaData.league"],
+          icon: row["metaData.icon"],
+        },
+        availabiltyData: {
+          startDateTime: row["availabiltyData.startDateTime"],
+          endDateTime: row["availabiltyData.endDateTime"],
+          totalTime: row["availabiltyData.totalTime"],
+          userPlayTime: row["availabiltyData.userPlayTime"],
+        },
+        holeData: {
+          isRandom: row["holeData.isRandom"],
           holeCount: row["holeData.holeCount"],
           holeData: row["holeData.holeData"],
         },
@@ -95,7 +157,7 @@ class tournamentDAO {
   async insertTournament(tournament: Tournament) {
     //putting tournament logic
     try {
-      const [{ tournament_id }] = await db
+      const [{ id }] = await db
         .table(TOURNAMENT_TABLE_NAME)
         .insert({
           id: tournament.metaData.category, // UUID
@@ -109,17 +171,17 @@ class tournamentDAO {
           hole_count: tournament.holeData.holeCount,
           is_random: tournament.holeData.isRandom,
         })
-        .returning("tournament_id");
+        .returning("id");
 
       tournament.holeData.holeData.forEach(async (element) => {
         try {
-          await holeDataDAO.insert(element, tournament_id);
+          await holeDataDAO.insert(element, id);
         } catch (error: any) {
           throw error;
         }
       });
 
-      return tournament_id;
+      return id;
     } catch (error) {
       throw error;
     }

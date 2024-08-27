@@ -16,7 +16,7 @@ class holeDataDAO {
     }
   }
 
-  async insert(holdData: HoleData, tournamentId: number) {
+  async insert(holdData: HoleData, tournamentId: string) {
     try {
       const [hole_data_id] = await db
         .table(HOLE_DATA_TABLE_NAME)

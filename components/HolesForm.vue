@@ -31,7 +31,8 @@ import { ref, computed, watch, defineComponent } from 'vue';
 import { JsonForms } from '@jsonforms/vue';
 import { defaultStyles, mergeStyles, vuetifyRenderers } from '@jsonforms/vue-vuetify';
 import holeDataSchema, { holeSchemaForUi, testingHoleScehma, type HoleData, type Holes } from '~/schemas/tournament/holesSchema';
-import { defualtHoleFormData } from '~/constants/FormConstants';
+import { defaultHoleData, defualtHoleFormData } from '~/constants/FormConstants';
+import type { Tournament } from '~/schemas/tournamentSchema';
 
 // Reactive state
 const page = ref(1);
@@ -61,12 +62,10 @@ const uischema = {
     ],
 };
 
-//This is only for hole count
 
-const holeDataForForm = ref<Holes>(defualtHoleFormData);
+const tournamentData = useState<Tournament | null>('tournamentData');
 
-// Form data
-const data = ref(defualtHoleFormData.holeData);
+let holeDataForForm = ref<Holes>(tournamentData?.value?.holeData || defualtHoleFormData);
 
 // Renderer and styles
 const renderers = Object.freeze([...vuetifyRenderers]);
@@ -84,10 +83,14 @@ const headers = [
 // emit for Hole data to parent
 const emit = defineEmits(['holeFormEmit']);
 
+onMounted(() => {
+    console.log("on Mounted tournament is ", tournamentData.value);
+    if (tournamentData.value === null)
+        holeDataForForm.value.holeData = [];
+})
+
 // Methods
 const onChange = (event: { data: any }) => {
-
-
     holeDataForForm.value = event.data;
     console.log('count', holeDataForForm.value.holeCount);
 
@@ -102,8 +105,8 @@ const onChange = (event: { data: any }) => {
 
 const handleHoleDataEmit = (newHoleFormData: any) => {
     console.log(newHoleFormData);
-    holeDataForForm.value.holeData = data.value;
-    data.value.push(newHoleFormData); // Add new data to the form data array
+    // holeDataForForm.value.holeData = holeDataForForm.value;
+    holeDataForForm.value.holeData.push(newHoleFormData); // Add new data to the form data array
     // After adding the new data, reload the items in the table
     loadItems({ page: page.value, itemsPerPage: itemsPerPage.value, sortBy: '' });
 };
@@ -135,7 +138,7 @@ const FakeAPI = {
             setTimeout(() => {
                 const start = (page - 1) * itemsPerPage;
                 const end = start + itemsPerPage;
-                const items = data.value.slice().filter((item: any) => {
+                const items = holeDataForForm.value.holeData.slice().filter((item: any) => {
                     if (search.courseId && !item.courseId.toLowerCase().includes(search.courseId.toLowerCase())) {
                         return false;
                     }
