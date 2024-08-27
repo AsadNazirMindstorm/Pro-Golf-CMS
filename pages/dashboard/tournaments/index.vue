@@ -131,7 +131,8 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: { page: number, itemsPe
                 "itemsPerPage": itemsPerPage,
             }
         });
-        serverItems.value = response.data;
+        serverItems.value = response.data.items;
+        totalItems.value = response.data.totalCount;
 
         //loop through it
         itemsForDisplay.value = [];
@@ -196,7 +197,7 @@ const handleDelete = async (item: any) => {
         if (serverResponse.success) {
             alert('deleted successfully');
             await loadItems({
-                page: 1, // Assuming you want to start from the first page
+                page: 3, // Assuming you want to start from the first page
                 itemsPerPage: itemsPerPage.value,
                 sortBy: [] // Adjust sorting if needed
             });
