@@ -21,6 +21,7 @@ class tournamentDAO {
         t.is_random AS "holeData.isRandom",
         t.created_at AS "createdAt",
         t.updated_at AS "updatedAt",
+        t.pushed_to_nakama AS "pushedToNakama",
         json_agg(
           json_build_object(
             'courseId', h.course_id,
@@ -57,6 +58,7 @@ class tournamentDAO {
         },
         createdAt: row["createdAt"],
         updatedAt: row["updatedAt"],
+        pushedToNakama: row["pushedToNakama"],
       }));
     } catch (error: any) {
       console.log(error);
@@ -81,6 +83,7 @@ class tournamentDAO {
         t.is_random AS "holeData.isRandom",
         t.created_at AS "createdAt",
         t.updated_at AS "updatedAt",
+        t.pushed_to_nakama AS "pushedToNakama",
         json_agg(
           json_build_object(
             'courseId', h.course_id,
@@ -170,6 +173,7 @@ class tournamentDAO {
           total_play_time: tournament.availabiltyData.totalTime,
           hole_count: tournament.holeData.holeCount,
           is_random: tournament.holeData.isRandom,
+          pushed_to_nakama: tournament.pushedToNakama,
         })
         .returning("id");
 
@@ -183,6 +187,20 @@ class tournamentDAO {
 
       return id;
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateStatus(id: string, status: boolean) {
+    try {
+      const res = await db
+        .table(TOURNAMENT_TABLE_NAME)
+        .where({ id }) // Filter the row(s) by ID
+        .update({ pushed_to_nakama: status }); // Update the field
+
+        return res;
+        
+    } catch (error: any) {
       throw error;
     }
   }

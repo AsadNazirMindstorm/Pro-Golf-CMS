@@ -1,15 +1,20 @@
 <template>
     <div class="flex justify-between mb-8 mt-4">
         <h1 class="lg:text-3xl font-semibold">Tournaments</h1>
-        <NuxtLink to="/dashboard/tournaments/create">
-            <v-btn color="blue" prepend-icon="mdi-plus">Create Tournament</v-btn>
-        </NuxtLink>
+        <div>
+            <NuxtLink to="/dashboard/tournaments/create">
+                <v-btn class="me-4" color="blue" prepend-icon="mdi-plus">Create Tournament</v-btn>
+            </NuxtLink>
+
+            <v-btn class="" @click="handlePushToNakama" :disabled="selected.length === 0" prepend-icon="mdi-upload-box"
+                color="purple">Push to Nakama</v-btn>
+        </div>
     </div>
     <div class="tournamentsTables">
-        <div class="searchBar w-[70%] my-8 flex items-center">
+        <div class="searchBar w-[70%] my-8 flex item-center justify-between">
             <v-text-field :loading="loading" v-model="tournaments" append-inner-icon="mdi-magnify" density="compact"
                 label="Search templates" variant="solo" hide-details single-line></v-text-field>
-            <div class="mx-6"> <v-btn color="success" variant="elevated">Search</v-btn></div>
+
         </div>
 
         <v-data-table-server style="box-shadow: grey 0px 0px 18px -8px; border-radius: 5px;"
@@ -24,10 +29,22 @@
                 </span>
             </template>
 
+            <!-- Custom Tournaments Header -->
+            <template v-slot:header.pushedToNakama="{ column }">
+                <span class="font-bold">
+                    {{ column.title.toUpperCase() }}
+                </span>
+            </template>
             <!-- Loading Icon -->
             <template v-slot:item.icon="{ item }">
                 <v-img :src="item.icon" :alt="item.name" style="width: 10vw; max-width: 6rem; padding: 0.5rem 0;"
                     contain></v-img>
+            </template>
+
+
+            <template v-slot:item.pushedToNakama="{ item }">
+                <span v-if="item.pushedToNakama" class="bg-green-300 text-green-900 rounded-xl px-4 py-2">Yes</span>
+                <span v-else class="bg-red-300 text-red-900 rounded-xl px-4 py-2">No</span>
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon class="me-2" size="small" @click="handleEdit(item)">
@@ -44,9 +61,9 @@
                 </v-icon>
             </template>
         </v-data-table-server>
-        <div>
+        <!-- <div>
             {{ selected }}
-        </div>
+        </div> -->
     </div>
     <NuxtPage />
 </template>
@@ -95,6 +112,12 @@ const headers = ref([
         sortable: false,
     },
     {
+        title: 'Pushed',
+        key: 'pushedToNakama',
+        align: 'center',
+        sortable: false
+    },
+    {
         title: 'Created At',
         key: 'createdAt',
         align: 'center',
@@ -118,7 +141,7 @@ const serverItems = ref<Tournament[]>([]);
 const loading = ref<boolean>(true);
 const totalItems = ref<number>(0);
 const selectAll = ref<boolean>(false);
-const selected = ref<number[]>([]);
+const selected = ref<Object[]>([]);
 const itemsForDisplay = ref<Object[]>([]);
 
 // Method to load items from the server
@@ -142,6 +165,7 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: { page: number, itemsPe
                 tournamentId: element.metaData.category,
                 id: index++,
                 tournaments: element.metaData.title, //title of tournament
+                pushedToNakama: element.pushedToNakama,
                 icon: tournamentIconsArrays[Number(element.metaData.icon) - 1].img, //using images locally
                 league: element.metaData.league,
                 createdAt: element.createdAt ? element.createdAt : " ",
@@ -197,10 +221,12 @@ const handleDelete = async (item: any) => {
         if (serverResponse.success) {
             alert('deleted successfully');
             await loadItems({
-                page: 3, // Assuming you want to start from the first page
+                page: 1, // Assuming you want to start from the first page
                 itemsPerPage: itemsPerPage.value,
                 sortBy: [] // Adjust sorting if needed
             });
+
+
         }
         else {
             alert("error occurred");
@@ -216,7 +242,7 @@ const handleDelete = async (item: any) => {
 const handleEdit = (item: any) => {
     const router = useRouter();
     // Navigate to /dashboard/edit/:id with item.uuid
-    router.push('/dashboard/tournaments/edit/'+item.tournamentId);
+    router.push('/dashboard/tournaments/edit/' + item.tournamentId);
 };
 
 const handleCopy = async (item: any) => {
@@ -228,6 +254,38 @@ const handleCopy = async (item: any) => {
         alert("Error occured");
     }
 }
+
+const handlePushToNakama = async () => {
+    try {
+
+
+        let dataToBePushed: Tournament[] = [];
+
+        selected.value.forEach(ele => {
+            dataToBePushed.push(ele.completeObject);
+        })
+
+        const res: ServerResponse = await $fetch('/api/pushToNakama', {
+            method: 'POST',
+            body: JSON.stringify(dataToBePushed)
+        })
+
+        if (res.success) {
+            alert("Pushed To Nakama");
+        }
+        await loadItems({
+            page: 1, // Assuming you want to start from the first page
+            itemsPerPage: itemsPerPage.value,
+            sortBy: [] // Adjust sorting if needed
+        });
+    }
+    catch (err: any) {
+        alert("Error Occurred")
+    }
+
+
+}
+
 
 // Watcher for tournaments changes
 watch(tournaments, () => {

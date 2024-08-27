@@ -18,6 +18,10 @@ export default defineEventHandler(async (event) => {
     if (!useAjv().validateHoleForm(body.holeData))
       throw new Error("Holes are incorrect");
 
+    //set the status of the new tournament tp false
+    body.pushedToNakama = false;
+
+    //then store it
     const res = await tournamentDAO.createCopy(body);
 
     return (serverResponse = {

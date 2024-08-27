@@ -152,7 +152,8 @@ const handleSubmit = async () => {
     let tournament: Tournament = {
         metaData: metaFormData.value,
         holeData: holeFormData.value,
-        availabiltyData: availabiltyFormData.value
+        availabiltyData: availabiltyFormData.value,
+        pushedToNakama:false
     };
 
     //Final Object
@@ -202,7 +203,8 @@ const handleEdit = async () => {
         let tournament: Tournament = {
             metaData: metaFormData.value,
             holeData: holeFormData.value,
-            availabiltyData: availabiltyFormData.value
+            availabiltyData: availabiltyFormData.value,
+            pushedToNakama:false
         };
 
         const res = await $fetch('/api/editTournament',
