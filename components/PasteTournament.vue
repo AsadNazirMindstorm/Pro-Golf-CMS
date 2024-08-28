@@ -34,7 +34,7 @@ import { AvailabilitySchema } from '~/schemas/tournament/availabiltySchema';
 const title = ref('');
 
 // Function to parse the JSON
-const parseJson = (isActive: any) => {
+const parseJson = async (isActive: any) => {
     try {
         const parsedData: Tournament = JSON.parse(title.value);
         console.log('Parsed Data:', parsedData);
@@ -45,6 +45,21 @@ const parseJson = (isActive: any) => {
             throw new Error();
         if (!useAjv().validateHoleForm(parsedData.holeData))
             throw new Error();
+
+        const res = await $fetch('/api/copyTournament',{
+            method:'POST',
+            body:JSON.stringify(parsedData)
+        })
+
+
+        if(res.success)
+        {
+            alert("Entered Succesfully")
+        }
+
+        else{
+            alert("error");
+        }
 
         isActive.value = false;
         // You can use parsedData here as needed

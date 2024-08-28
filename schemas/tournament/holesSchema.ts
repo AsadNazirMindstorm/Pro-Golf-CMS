@@ -11,7 +11,7 @@ export interface Holes {
 export interface HoleData {
   courseId: string; // Text field input
   holeId: number; // A single number input through a drop-down
-  teePosition: number; // A single number input through a drop-down
+  teePosition: string; // A single number input through a drop-down
   windSpeed: string;
   windDirection: string[]; // Can contain multiple data based on checkboxes
 }
@@ -27,22 +27,22 @@ const holeDataSchema: JSONSchemaType<HoleData> = {
     },
     holeId: {
       type: "number",
-      enum: [1, 2, 4],
+      enum: [1, 2, 3, 4, 5, 6],
     },
     teePosition: {
-      type: "number",
-      description: "Tee position",
+      type: "string",
+      enum: ["1", "2", "3"],
     },
     windSpeed: {
       type: "string",
-      enum: ["1", "2", "3"],
+      enum: ["1 kmph", "2 kmph", "3 kmph"],
     },
     windDirection: {
       type: "array",
       uniqueItems: true,
       items: {
         type: "string",
-        enum: ["foo", "bar", "foobar"], // Define possible values for windDirection
+        enum: ["North", "West", "East", "South"], // Define possible values for windDirection
       },
       description: "Wind direction options",
     },
@@ -75,22 +75,22 @@ const testingHoleScehma: JSONSchemaType<Holes> = {
           },
           holeId: {
             type: "number",
-            enum: [1, 2, 4],
+            enum: [1, 2, 3, 4, 5, 6],
           },
           teePosition: {
-            type: "number",
-            description: "Tee position",
+            type: "string",
+            enum: ["1", "2", "3"],
           },
           windSpeed: {
             type: "string",
-            enum: ["1", "2", "3"],
+            enum: ["1 kmph", "2 kmph", "3 kmph"],
           },
           windDirection: {
             type: "array",
             uniqueItems: true,
             items: {
               type: "string",
-              enum: ["foo", "bar", "foobar"], // Define possible values for windDirection
+              enum: ["North", "West", "East", "South"], // Define possible values for windDirection
             },
             description: "Wind direction options",
           },
@@ -126,7 +126,7 @@ const holeSchema: JSONSchemaType<Holes> = {
     },
     holeData: {
       type: "array",
-      minItems: 0,
+      minItems: 1,
       maxItems: 1000,
       items: {
         $ref: "#holeDataSchema",

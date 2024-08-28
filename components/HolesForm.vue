@@ -18,6 +18,21 @@
             v-model:items-per-page="itemsPerPage" :headers="headers" :items="serverItems" :items-length="totalItems"
             :loading="loading" item-value="courseId" v-model="selected" :search="search" return-object
             @update:options="loadItems" show-select>
+
+            <template v-slot:item.actions="{ item }">
+                <v-icon class="me-2" size="small" @click="">
+                    mdi-pencil
+                </v-icon>
+                <v-icon class="me-2" size="small" @click="handleDelete(item)">
+                    mdi-delete
+                </v-icon>
+                <v-icon class="me-2" size="small" @click="">
+                    mdi-content-copy
+                </v-icon>
+                <v-icon size="small" @click="">
+                    mdi-content-duplicate
+                </v-icon>
+            </template>
         </v-data-table-server>
         <div>
             {{ selected }}
@@ -62,7 +77,6 @@ const uischema = {
     ],
 };
 
-
 const tournamentData = useState<Tournament | null>('tournamentData');
 
 let holeDataForForm = ref<Holes>(tournamentData?.value?.holeData || defualtHoleFormData);
@@ -78,6 +92,7 @@ const headers = [
     { title: 'Hole ID', key: 'holeId', align: 'end' },
     { title: 'Tee Position', key: 'teePosition', align: 'end' },
     { title: 'Wind Direction', key: 'windDirection', align: 'end' },
+    { title: 'Actions', key: 'actions', align: 'center' },
 ];
 
 // emit for Hole data to parent
@@ -129,6 +144,13 @@ const loadItems = ({ page: p, itemsPerPage: ipp, sortBy }: { page: number; items
 watch(courseId, () => {
     search.value = String(Date.now());
 });
+
+//Delete Handler
+const handleDelete= (item:any) =>
+{
+    console.log(item);
+}
+
 
 // Fake API
 const FakeAPI = {

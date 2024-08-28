@@ -61,9 +61,9 @@
                 </v-icon>
             </template>
         </v-data-table-server>
-        <!-- <div>
+        <div>
             {{ selected }}
-        </div> -->
+        </div>
     </div>
     <NuxtPage />
 </template>
@@ -145,13 +145,15 @@ const selected = ref<Object[]>([]);
 const itemsForDisplay = ref<Object[]>([]);
 
 // Method to load items from the server
-const loadItems = async ({ page, itemsPerPage, sortBy }: { page: number, itemsPerPage: number, sortBy: string[] }) => {
+const loadItems = async ({ page, itemsPerPage, sortBy, search }: { page: number, itemsPerPage: number, sortBy: string[], search:string }) => {
     loading.value = true;
+    console.log(tournaments);
     try {
         const response: ServerResponse = await $fetch('/api/getAllTournaments', {
             query: {
                 "page": page,
                 "itemsPerPage": itemsPerPage,
+                'search':tournaments.value
             }
         });
         serverItems.value = response.data.items;
@@ -276,8 +278,11 @@ const handlePushToNakama = async () => {
         await loadItems({
             page: 1, // Assuming you want to start from the first page
             itemsPerPage: itemsPerPage.value,
-            sortBy: [] // Adjust sorting if needed
+            sortBy: [], // Adjust sorting if needed,
+            search:''
         });
+
+        selected.value=[];
     }
     catch (err: any) {
         alert("Error Occurred")
