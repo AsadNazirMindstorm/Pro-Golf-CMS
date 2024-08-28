@@ -70,9 +70,11 @@
 
 <script setup lang="ts">
 import { JsonForms } from '@jsonforms/vue';
+import { useDebounceFn } from '@vueuse/core';
 import { tournamentIconsArrays } from '~/constants/FormConstants';
 import type { ServerResponse } from '~/schemas/responseSchema';
 import { type Tournament } from '~/schemas/tournamentSchema';
+import { debounce } from '~/Utility/debounce';
 
 
 // Reactive state
@@ -145,7 +147,7 @@ const selected = ref<Object[]>([]);
 const itemsForDisplay = ref<Object[]>([]);
 
 // Method to load items from the server
-const loadItems = async ({ page, itemsPerPage, sortBy, search }: { page: number, itemsPerPage: number, sortBy: string[], search:string }) => {
+const loadItems = async ({ page, itemsPerPage, sortBy, search }: { page: number, itemsPerPage: number, sortBy: string[], search: string }) => {
     loading.value = true;
     console.log(tournaments);
     try {
@@ -153,7 +155,7 @@ const loadItems = async ({ page, itemsPerPage, sortBy, search }: { page: number,
             query: {
                 "page": page,
                 "itemsPerPage": itemsPerPage,
-                'search':tournaments.value
+                'search': tournaments.value
             }
         });
         serverItems.value = response.data.items;
@@ -197,7 +199,8 @@ const handleDuplicate = async (item: any) => {
             await loadItems({
                 page: 1, // Assuming you want to start from the first page
                 itemsPerPage: itemsPerPage.value,
-                sortBy: [] // Adjust sorting if needed
+                sortBy: [], // Adjust sorting if needed,
+                search: ''
             });
         }
         else {
@@ -225,7 +228,8 @@ const handleDelete = async (item: any) => {
             await loadItems({
                 page: 1, // Assuming you want to start from the first page
                 itemsPerPage: itemsPerPage.value,
-                sortBy: [] // Adjust sorting if needed
+                sortBy: [], // Adjust sorting if needed,
+                search: ''
             });
 
 
@@ -279,10 +283,10 @@ const handlePushToNakama = async () => {
             page: 1, // Assuming you want to start from the first page
             itemsPerPage: itemsPerPage.value,
             sortBy: [], // Adjust sorting if needed,
-            search:''
+            search: ''
         });
 
-        selected.value=[];
+        selected.value = [];
     }
     catch (err: any) {
         alert("Error Occurred")
@@ -291,9 +295,13 @@ const handlePushToNakama = async () => {
 
 }
 
+const debounce = useDebounceFn(() => {
+    // debounce(() => { search.value = String(Date.now()); }, 500);
+    search.value = String(Date.now());
+}, 500)
 
 // Watcher for tournaments changes
 watch(tournaments, () => {
-    search.value = String(Date.now());
+    debounce();
 });
 </script>
