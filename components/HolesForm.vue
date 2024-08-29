@@ -5,7 +5,7 @@
     </div>
     <div class="flex justify-between mb-8 mt-4">
         <h1 class="lg:text-2xl font-semibold">Holes</h1>
-        <hole-data-form :is-created-disabled="isCreateDisabled" @hole-data-emit="handleHoleDataEmit" />
+        <hole-data-form :is-open="openCreateDiaolougueBox" :is-created-disabled="isCreateDisabled" @hole-data-emit="handleHoleDataEmit" />
     </div>
     <div class="holesTable">
         <div class="searchBar outline-1 w-[70%] my-8 flex items-center">
@@ -20,7 +20,7 @@
             @update:options="loadItems" show-select>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon class="me-2" size="small" @click="">
+                <v-icon class="me-2" size="small" @click="handleEdit(item)">
                     mdi-pencil
                 </v-icon>
                 <v-icon class="me-2" size="small" @click="handleDelete(item)">
@@ -60,6 +60,7 @@ const totalItems = ref(0);
 const selectAll = ref(false);
 const selected = ref([]);
 const isCreateDisabled = ref<boolean>(true);
+const openCreateDiaolougueBox = ref<boolean>(false);
 
 // Schema and UI schema
 const schema = testingHoleScehma;
@@ -76,6 +77,10 @@ const uischema = {
         }
     ],
 };
+
+//State for maintaining data for editing of hole data entry
+const holeDataState = useState<HoleData | null>('holeData', () => null);
+const isOpen = useState<boolean>('isOpen', ()=>false);
 
 const tournamentData = useState<Tournament | null>('tournamentData');
 
@@ -99,7 +104,7 @@ const headers = [
 const emit = defineEmits(['holeFormEmit']);
 
 onMounted(() => {
-    console.log("on Mounted tournament is ", tournamentData.value);
+    // console.log("on Mounted tournament is ", tournamentData.value);
     if (tournamentData.value === null)
         holeDataForForm.value.holeData = [];
 })
@@ -145,12 +150,32 @@ watch(courseId, () => {
     search.value = String(Date.now());
 });
 
-//Delete Handler
-const handleDelete= (item:any) =>
-{
-    console.log(item);
+// Delete Handler
+const handleDelete = (item: any) => {
+    // Ensure that item has the index property and it's valid
+    if (item.index !== undefined && item.index >= 0 && item.index < holeDataForForm.value.holeData.length) {
+        // Create a new array without the item at the specified index
+        holeDataForForm.value.holeData = holeDataForForm.value.holeData.filter((_, idx) => idx !== item.index);
+
+        // Reload items with the current page and other parameters
+        loadItems({
+            page: page.value,
+            itemsPerPage: itemsPerPage.value,
+            sortBy: []
+        });
+    } else {
+        console.error('Invalid index for deletion');
+    }
 }
 
+const handleDuplicate = (item: any) => {
+
+}
+
+const handleEdit = (item: any) => {
+    isOpen.value=true;
+    holeDataState.value = item;
+}
 
 // Fake API
 const FakeAPI = {
@@ -168,6 +193,15 @@ const FakeAPI = {
                 });
 
                 const paginated = items.slice(start, end);
+
+                paginated.forEach((ele, index) => {
+                    Object.defineProperty(ele, 'index', {
+                        value: index,
+                        writable: true,
+                        enumerable: true,
+                        configurable: true
+                    });
+                });
 
                 resolve({ items: paginated, total: items.length });
             }, 500);

@@ -14,6 +14,7 @@ export interface HoleData {
   teePosition: string; // A single number input through a drop-down
   windSpeed: string;
   windDirection: string[]; // Can contain multiple data based on checkboxes
+  index?:numebr
 }
 
 // Hole Data Schema

@@ -1,23 +1,23 @@
 <template>
-    <v-dialog max-width="500" :close-on-content-click="false">
-        <template v-slot:activator="{ props: activatorProps }">
-            <v-btn v-bind="activatorProps" color="blue" :disabled="isCreatedDisabled"
-                prepend-icon="mdi-plus">Create</v-btn>
-        </template>
+    <v-btn color="blue" @click="handleOpening" :disabled="isCreatedDisabled" prepend-icon="mdi-plus">Create</v-btn>
+    <v-dialog max-width="500" v-model="isOpen" :close-on-content-click="false">
         <template v-slot:default="{ isActive }">
+
             <v-card title="Dialog">
+                {{ holeFormDataState }}
                 <v-card-text>
                     <v-form>
-                        <json-forms :data="data" :renderers="renderers" :schema="schema" :uischema="uischema"
-                            @change="onChange" />
+                        <json-forms :data="holeFormDataState" :renderers="renderers" :schema="schema"
+                            :uischema="uischema" @change="onChange" />
                     </v-form>
                 </v-card-text>
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn :disabled="isSaveDisabled" color="green" @click="handleHoleDataSubmit(isActive)">Save</v-btn>
+                    <v-btn v-if="holeFormDataState!==defaultHoleData" color="purple" @click="handleEdit">Update</v-btn>
+                    <v-btn v-else :disabled="isSaveDisabled" color="green" @click="handleHoleDataSubmit(isActive)">Save</v-btn>
                     <v-btn text="Close Dialog"
-                        @click="() => { data = defaultHoleData; isActive.value = false }"></v-btn>
+                        @click="() => { holeFormDataState = defaultHoleData; isOpen = false }"></v-btn>
                 </v-card-actions>
             </v-card>
         </template>
@@ -37,10 +37,12 @@ import { useAjv } from '~/composable/Ajv';
 const renderers = Object.freeze([...vuetifyRenderers]);
 const schema = holeDataSchema;
 
+const isOpen = useState<boolean>('isOpen');
+
+const holeFormDataState = useState<HoleData>('holeData');
 
 const emit = defineEmits(['holeDataEmit']);
 
-let holeDataFormData = ref<HoleData>(defaultHoleData)
 
 // UI schema for the JSON form
 const uischema = {
@@ -77,11 +79,14 @@ const uischema = {
 };
 
 const isSaveDisabled = ref(true);
+const handleEdit = () =>
+{
 
-
+}
 const onChange = (event: JsonFormsChangeEvent) => {
-    holeDataFormData.value = event.data;
-    const isValid = useAjv().validate(holeDataSchema, holeDataFormData.value);
+    holeFormDataState.value = event.data;
+    console.log()
+    const isValid = useAjv().validate(holeDataSchema, holeFormDataState.value);
 
     if (isValid) isSaveDisabled.value = false;
 
@@ -89,7 +94,9 @@ const onChange = (event: JsonFormsChangeEvent) => {
 
 const handleHoleDataSubmit = (closeDialougue: globalThis.Ref<boolean>) => {
 
-    const isValid = useAjv().validate(holeDataSchema, holeDataFormData.value);
+    const isValid = useAjv().validate(holeDataSchema, holeFormDataState.value);
+    //console.log(holeDataFormData.value);
+
     if (!isValid) {
         alert("Please Enter the correct data !");
         return;
@@ -97,15 +104,23 @@ const handleHoleDataSubmit = (closeDialougue: globalThis.Ref<boolean>) => {
 
 
     //Emmitting the Data to the Parent
-    emit("holeDataEmit", holeDataFormData.value);
-    closeDialougue.value = false;
+    emit("holeDataEmit", holeFormDataState.value);
+    isOpen.value = false;
 
+    //reseting
+    holeFormDataState.value = defaultHoleData;
 
 }
 
+const handleOpening = () => {
+    // console.log("This is the value you are looking for", holeDataFormData.value);
+    holeFormDataState.value = defaultHoleData;
+    isOpen.value = true;
+}
+
 //defining props
-defineProps({
-    isCreatedDisabled: Boolean
+const props = defineProps({
+    isCreatedDisabled: Boolean,
 })
 
 
