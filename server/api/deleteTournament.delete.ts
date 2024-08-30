@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       data:res
     }
   } catch (error: any) {
-    console.log(error);
+    //console.log(error);
 
     return serverResponse={
       success:false,

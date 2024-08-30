@@ -55,7 +55,7 @@ const uischema = {
 
 const tournamentData = useState<Tournament | null>('tournamentData');
 
-console.log("Tournament data in meta form", tournamentData.value?.metaData);
+// console.log("Tournament data in meta form", tournamentData.value?.metaData);
 const metaFormData = ref<Meta>(tournamentData.value?.metaData || defaultMetaFormData);
 
 //define emitters for this data
