@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     });
   } catch (error: any) {
     setResponseStatus(event, 503);
-    console.log(error);
+    //console.log(error);
     //error response
     return (serverResponse = {
       success: false,

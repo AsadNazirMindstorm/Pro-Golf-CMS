@@ -18,9 +18,9 @@
         </div>
 
         <v-data-table-server style="box-shadow: grey 0px 0px 18px -8px; border-radius: 5px;"
-            v-model:items-per-page="itemsPerPage" :headers="headers" :items="itemsForDisplay" :items-length="totalItems"
-            :loading="loading" item-value="id" v-model="selected" :search="search" return-object
-            @update:options="loadItems" show-select>
+            v-model:items-per-page="itemsPerPage" :show-current-page="true" :headers="headers" :items="itemsForDisplay"
+            :items-length="totalItems" :loading="loading" item-value="id" v-model="selected" :page="1" :search="search"
+            return-object @update:options="loadItems" show-select>
 
             <!-- Custom Tournaments Header -->
             <template v-slot:header.tournaments="{ column }">
@@ -61,9 +61,9 @@
                 </v-icon>
             </template>
         </v-data-table-server>
-        <div>
+        <!-- <div>
             {{ selected }}
-        </div>
+        </div> -->
     </div>
     <NuxtPage />
 </template>
@@ -74,7 +74,6 @@ import { useDebounceFn } from '@vueuse/core';
 import { tournamentIconsArrays } from '~/constants/FormConstants';
 import type { ServerResponse } from '~/schemas/responseSchema';
 import { type Tournament } from '~/schemas/tournamentSchema';
-import { debounce } from '~/Utility/debounce';
 
 
 // Reactive state
@@ -87,11 +86,10 @@ const headers = ref([
         sortable: false,
     },
     {
-
-        title: 'Id',
-        align: 'center',
-        sortable: false,
-        key: 'id',
+        title:'Id',
+        key:'tournamentId',
+        align:'center',
+        sortable:false
     },
 
     {
@@ -137,43 +135,58 @@ const headers = ref([
         sortable: false
     },
 ]);
+const page = ref<number>(1);
 const tournaments = ref<string>('');
-const search = ref<string>('');
+const search = ref(undefined);
 const serverItems = ref<Tournament[]>([]);
 const loading = ref<boolean>(true);
 const totalItems = ref<number>(0);
 const selectAll = ref<boolean>(false);
 const selected = ref<Object[]>([]);
 const itemsForDisplay = ref<Object[]>([]);
+const router = useRouter();
 
 // Method to load items from the server
 const loadItems = async ({ page, itemsPerPage, sortBy, search }: { page: number, itemsPerPage: number, sortBy: string[], search: string }) => {
     loading.value = true;
-    console.log(tournaments);
+    // console.log(tournaments);
     try {
         const response: ServerResponse = await $fetch('/api/getAllTournaments', {
             query: {
                 "page": page,
                 "itemsPerPage": itemsPerPage,
-                'search': tournaments.value
+                'search': tournaments.value,
+                sortBy: sortBy
             }
         });
+
         serverItems.value = response.data.items;
         totalItems.value = response.data.totalCount;
 
         //loop through it
         itemsForDisplay.value = [];
         let index: number = 1;
+
+        // Correct options for formatting
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',       // Options: "numeric" | "2-digit"
+            month: 'short',         // Options: "numeric" | "2-digit" | "long" | "short" | "narrow"
+            day: 'numeric',        // Options: "numeric" | "2-digit"
+            hour: '2-digit',       // Options: "numeric" | "2-digit"
+            minute: '2-digit',     // Options: "numeric" | "2-digit"
+            second: '2-digit',     // Options: "numeric" | "2-digit"
+            // Options: "short" | "long"
+        };
+
         serverItems.value.forEach(element => {
             let tempObj = {
                 tournamentId: element.metaData.category,
-                id: index++,
                 tournaments: element.metaData.title, //title of tournament
                 pushedToNakama: element.pushedToNakama,
                 icon: tournamentIconsArrays[Number(element.metaData.icon) - 1].img, //using images locally
                 league: element.metaData.league,
-                createdAt: element.createdAt ? element.createdAt : " ",
-                updatedAt: element.updatedAt ? element.updatedAt : " ",
+                createdAt: element.createdAt ? new Date(element.createdAt).toLocaleDateString('en-US', options) : " ",
+                updatedAt: element.updatedAt ? new Date(element.updatedAt).toLocaleDateString('en-US', options) : " ",
                 name: tournamentIconsArrays[Number(element.metaData.icon) - 1].name,
                 completeObject: element
             }
@@ -200,7 +213,7 @@ const handleDuplicate = async (item: any) => {
                 page: 1, // Assuming you want to start from the first page
                 itemsPerPage: itemsPerPage.value,
                 sortBy: [], // Adjust sorting if needed,
-                search: ''
+                search: tournaments.value
             });
         }
         else {
@@ -215,7 +228,7 @@ const handleDuplicate = async (item: any) => {
 //Delete and edit handler
 const handleDelete = async (item: any) => {
     try {
-        console.log(item);
+        // console.log(item);
         const serverResponse: ServerResponse = await $fetch('/api/deleteTournament', {
             method: 'DELETE',
             body: JSON.stringify({
@@ -225,12 +238,13 @@ const handleDelete = async (item: any) => {
 
         if (serverResponse.success) {
             alert('deleted successfully');
-            await loadItems({
+            const res = await loadItems({
                 page: 1, // Assuming you want to start from the first page
                 itemsPerPage: itemsPerPage.value,
                 sortBy: [], // Adjust sorting if needed,
-                search: ''
+                search: tournaments.value
             });
+
 
 
         }

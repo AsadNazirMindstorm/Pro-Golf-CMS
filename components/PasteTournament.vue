@@ -37,7 +37,7 @@ const title = ref('');
 const parseJson = async (isActive: any) => {
     try {
         const parsedData: Tournament = JSON.parse(title.value);
-        console.log('Parsed Data:', parsedData);
+        // console.log('Parsed Data:', parsedData);
 
         if (!useAjv().validate(metaSchema, parsedData.metaData))
             throw new Error();

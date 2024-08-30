@@ -5,7 +5,8 @@
     </div>
     <div class="flex justify-between mb-8 mt-4">
         <h1 class="lg:text-2xl font-semibold">Holes</h1>
-        <hole-data-form :is-open="openCreateDiaolougueBox" :is-created-disabled="isCreateDisabled" @hole-data-emit="handleHoleDataEmit" />
+        <hole-data-form :is-open="openCreateDiaolougueBox" :is-created-disabled="isCreateDisabled"
+            @hole-data-emit="handleHoleDataEmit" />
     </div>
     <div class="holesTable">
         <div class="searchBar outline-1 w-[70%] my-8 flex items-center">
@@ -29,7 +30,7 @@
                 <v-icon class="me-2" size="small" @click="">
                     mdi-content-copy
                 </v-icon>
-                <v-icon size="small" @click="">
+                <v-icon size="small" @click="handleDuplicate(item)">
                     mdi-content-duplicate
                 </v-icon>
             </template>
@@ -48,6 +49,8 @@ import { defaultStyles, mergeStyles, vuetifyRenderers } from '@jsonforms/vue-vue
 import holeDataSchema, { holeSchemaForUi, testingHoleScehma, type HoleData, type Holes } from '~/schemas/tournament/holesSchema';
 import { defaultHoleData, defualtHoleFormData } from '~/constants/FormConstants';
 import type { Tournament } from '~/schemas/tournamentSchema';
+import { useAjv } from '~/composable/Ajv';
+import HoleDataForm from './HoleDataForm.vue';
 
 // Reactive state
 const page = ref(1);
@@ -57,10 +60,10 @@ const courseId = ref('');
 const serverItems = ref([]);
 const loading = ref(true);
 const totalItems = ref(0);
-const selectAll = ref(false);
 const selected = ref([]);
 const isCreateDisabled = ref<boolean>(true);
 const openCreateDiaolougueBox = ref<boolean>(false);
+const editIndex = useState<number>('editIndex', () => -1);
 
 // Schema and UI schema
 const schema = testingHoleScehma;
@@ -80,7 +83,7 @@ const uischema = {
 
 //State for maintaining data for editing of hole data entry
 const holeDataState = useState<HoleData | null>('holeData', () => null);
-const isOpen = useState<boolean>('isOpen', ()=>false);
+const isOpen = useState<boolean>('isOpen', () => false);
 
 const tournamentData = useState<Tournament | null>('tournamentData');
 
@@ -112,25 +115,33 @@ onMounted(() => {
 // Methods
 const onChange = (event: { data: any }) => {
     holeDataForForm.value = event.data;
-    console.log('count', holeDataForForm.value.holeCount);
-
     //disabling the create when the value is less than 1
-    if (holeDataForForm.value.holeCount !== undefined && holeDataForForm.value.holeCount > 0)
-        isCreateDisabled.value = false;
+    if (holeDataForForm.value.holeCount === undefined || holeDataForForm.value.holeCount <= 0)
+        isCreateDisabled.value = true;
 
-    else isCreateDisabled.value = true;
+    else if (holeDataForForm.value.holeCount === holeDataForForm.value.holeData.length && holeDataForForm.value.isRandom == false)
+        isCreateDisabled.value = true;
+
+    else isCreateDisabled.value = false;
 
     emit('holeFormEmit', holeDataForForm.value);
 };
 
 const handleHoleDataEmit = (newHoleFormData: any) => {
-    console.log(newHoleFormData);
-    // holeDataForForm.value.holeData = holeDataForForm.value;
-    holeDataForForm.value.holeData.push(newHoleFormData); // Add new data to the form data array
-    // After adding the new data, reload the items in the table
+    //updating the already existing index if edit index is not -1 (default value)
+    if (editIndex.value !== -1)
+        holeDataForForm.value.holeData[editIndex.value] = newHoleFormData;
+    else
+        holeDataForForm.value.holeData.push(newHoleFormData);
+
     loadItems({ page: page.value, itemsPerPage: itemsPerPage.value, sortBy: '' });
+
+    //resetting the value
+    editIndex.value = -1;
 };
 
+
+//Function to load the items
 const loadItems = ({ page: p, itemsPerPage: ipp, sortBy }: { page: number; itemsPerPage: number; sortBy: any }) => {
     loading.value = true;
     FakeAPI.fetch({
@@ -164,23 +175,65 @@ const handleDelete = (item: any) => {
             sortBy: []
         });
     } else {
-        console.error('Invalid index for deletion');
+        alert('Error Occured');
+        // console.error('Invalid index for deletion');
     }
 }
 
 const handleDuplicate = (item: any) => {
 
+    if (holeDataForForm.value.holeCount >= holeDataForForm.value.holeData.length && holeDataForForm.value.isRandom == false) {
+        alert("Cannot create a copy please change hole count");
+        return;
+    }
+
+    let tmpHoleData: HoleData = {
+        holeId: item.holeId,
+        teePosition: item.teePosition,
+        windDirection: item.windDirection,
+        windSpeed: item.windSpeed,
+        courseId: item.courseId
+    }
+
+    holeDataForForm.value.holeData.push(tmpHoleData);
+
+    //load the data again
+    loadItems({ page: 1, itemsPerPage: 5, sortBy: [] });
+
+    //alert 
+    alert("Duplicate created !");
+}
+
+const handleHoleDataUpdateEmit = (newHoleData: HoleData) => {
+
+    //updating the already existing index if edit index is not -1 (default value)
+    if (editIndex.value !== -1)
+        holeDataForForm.value.holeData[editIndex.value] = newHoleData;
+    else
+        holeDataForForm.value.holeData.push(newHoleData);
+
+    loadItems({ page: 1, itemsPerPage: 5, sortBy: [] });
 }
 
 const handleEdit = (item: any) => {
-    isOpen.value=true;
-    holeDataState.value = item;
+    isOpen.value = true;
+    editIndex.value = item.index;
+
+    let tmpHoleData: HoleData = {
+        holeId: item.holeId,
+        teePosition: item.teePosition,
+        windDirection: item.windDirection,
+        windSpeed: item.windSpeed,
+        courseId: item.courseId
+    }
+
+    holeDataState.value = tmpHoleData;
 }
 
 // Fake API
 const FakeAPI = {
     async fetch({ page, itemsPerPage, sortBy, search }: { page: number; itemsPerPage: number; sortBy: any; search: { courseId: string } }) {
-        console.log('This is Search' + search.courseId);
+        // console.log('This is Search' + search.courseId);
         return new Promise<{ items: any[]; total: number }>((resolve) => {
             setTimeout(() => {
                 const start = (page - 1) * itemsPerPage;

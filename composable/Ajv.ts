@@ -25,7 +25,7 @@ export function useAjv() {
     const validateFunction = compileSchema(schema);
     const valid = validateFunction(data);
     if (!valid) {
-      console.error("Validation errors:", validateFunction.errors);
+      // console.error("Validation errors:", validateFunction.errors);
     }
     return valid;
   };

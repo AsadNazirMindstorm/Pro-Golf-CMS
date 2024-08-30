@@ -45,7 +45,6 @@ defineProps({ icon: String });
 
 
 const onIconSelect = (callback: (() => void) | undefined, n: string) => {
-    alert("selected is " + n);
 
     // Emitting this value to the parent component
     emit('icon', n);

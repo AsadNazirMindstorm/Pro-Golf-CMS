@@ -256,7 +256,7 @@ onMounted(async () => {
 
             //parse the data
             let data: Tournament[] = response.data;
-            console.log(data);
+            // console.log(data);
 
             if (!response.success) {
                 throw new Error("Error Occurred");

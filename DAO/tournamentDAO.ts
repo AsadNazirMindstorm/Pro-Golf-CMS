@@ -1,10 +1,10 @@
-import { TOURNAMENT_TABLE_NAME } from "~/constants/table";
+import { HOLE_DATA_TABLE_NAME, TOURNAMENT_TABLE_NAME } from "~/constants/table";
 import { db } from "~/database/db";
 import type { Tournament } from "~/schemas/tournamentSchema";
 import holeDataDAO from "./holeDataDAO";
 
 class tournamentDAO {
-  async getAll() {
+  async getAll(limit: number, offset: number, search: string) {
     try {
       // Query to get tournament data with nested hole data
       const results = await db.raw(`
@@ -34,7 +34,11 @@ class tournamentDAO {
       FROM tournament_table t
       LEFT JOIN hole_data_table h
       ON t.id = h.tournament_id
+      WHERE (LOWER(t.title) LIKE LOWER('%${search}%'))
       GROUP BY t.tournament_id
+      ORDER BY t.tournament_id DESC
+      OFFSET ${offset}
+      LIMIT ${limit}
     `);
 
       // Transform the raw results into the nested JSON format
@@ -61,7 +65,7 @@ class tournamentDAO {
         pushedToNakama: row["pushedToNakama"],
       }));
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
       throw error;
     }
   }
@@ -124,7 +128,7 @@ class tournamentDAO {
         updatedAt: row["updatedAt"],
       }));
     } catch (error: any) {
-      console.log(error);
+      //console.log(error);
       throw error;
     }
   }
@@ -152,7 +156,7 @@ class tournamentDAO {
       const id = await this.insertTournament(tournament);
       return id;
     } catch (error: any) {
-      console.log(error);
+      //console.log(error);
       throw error;
     }
   }
@@ -191,6 +195,24 @@ class tournamentDAO {
     }
   }
 
+  async getCount(search: string) {
+    try {
+      // Construct the search pattern
+      const searchPattern = `%${search.toLowerCase()}%`;
+
+      // Perform the count query
+      const [result] = await db(TOURNAMENT_TABLE_NAME)
+        .whereRaw("LOWER(title) LIKE ?", [searchPattern])
+        .count("id as count");
+
+      // Return the count as a number
+      return parseInt(result.count, 10);
+    } catch (error: any) {
+      console.error(error);
+      throw error;
+    }
+  }
+
   async updateStatus(id: string, status: boolean) {
     try {
       const res = await db
@@ -198,8 +220,7 @@ class tournamentDAO {
         .where({ id }) // Filter the row(s) by ID
         .update({ pushed_to_nakama: status }); // Update the field
 
-        return res;
-        
+      return res;
     } catch (error: any) {
       throw error;
     }

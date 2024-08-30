@@ -9,43 +9,36 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const itemsPerPage = parseInt(query.itemsPerPage as string, 10) || 10; // Default to 10 if not provided
     const page = parseInt(query.page as string, 10) || 1; // Default to 1 if not provided
-    const search: string = query.search as string;
+    const search: string = query.search as string || "";
 
-    console.log(itemsPerPage, page);
+    //console.log(itemsPerPage, page);
 
-    // Ensure page and itemsPerPage are positive integers
+    // Ensure itemsPerPage and page are positive integers
     if (itemsPerPage <= 0 || page <= 0) {
       throw new Error("Invalid pagination parameters");
     }
 
-    // Fetch all data
-    const allData = await tournamentDAO.getAll();
+    // Calculate offset
+    const offset = (page - 1) * itemsPerPage;
 
-    // Calculate the pagination slice
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedData: Tournament[] = allData.slice(startIndex, endIndex);
-
-    const filteredData = paginatedData.filter((element) => {
-      return (
-        !search || // If there's no search term, include all elements
-        element.metaData.title.toLowerCase().includes(search.toLowerCase())
-      );
-    });
-
+    // Fetch paginated data from DAO
+    const paginatedData: Tournament[] = await tournamentDAO.getAll(itemsPerPage, offset, search);
+    const totalItems = await tournamentDAO.getCount(search);
+  
     return (serverResponse = {
       success: true,
       data: {
-        items: filteredData,
-        totalCount: allData.length,
+        items: paginatedData,
+        totalCount:totalItems, // Total number of items
         itemsPerPage,
         currentPage: page,
+        totalPages: Math.ceil(paginatedData.length / itemsPerPage) // Calculate total pages
       },
     });
-  } catch (error) {
+  } catch (error:any) {
     return (serverResponse = {
       success: false,
-      message: error,
+      message: error.message,
     });
   }
 });
