@@ -10,7 +10,7 @@ export interface Tournament
   holeData:Holes
   createdAt?:string
   updatedAt?:string
-  pushedToNakama:boolean
+  pushedToNakama?:boolean
 }
 
 

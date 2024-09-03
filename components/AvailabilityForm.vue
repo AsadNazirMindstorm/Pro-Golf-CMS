@@ -21,7 +21,7 @@ const myStyles = mergeStyles(defaultStyles, { control: { label: 'mylabel' } });
 const tournamentData = useState<Tournament | null>('tournamentData');
 
 let availabilityFormData = ref<Availability>(tournamentData?.value?.availabiltyData || defaultAvailabiltyFormData);
-
+console.log(availabilityFormData.value);
 let schema = AvailabilitySchema;
 // UI schema for the JSON form
 const uischema = {

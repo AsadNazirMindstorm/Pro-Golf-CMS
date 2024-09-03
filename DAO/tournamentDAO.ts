@@ -42,7 +42,7 @@ class tournamentDAO {
     `);
 
       // Transform the raw results into the nested JSON format
-      return results.rows.map((row: { [x: string]: any }) => ({
+      const res = results.rows.map((row: { [x: string]: any }) => ({
         metaData: {
           category: row["metaData.id"],
           title: row["metaData.title"],
@@ -50,8 +50,12 @@ class tournamentDAO {
           icon: row["metaData.icon"],
         },
         availabiltyData: {
-          startDateTime: row["availabiltyData.startDateTime"],
-          endDateTime: row["availabiltyData.endDateTime"],
+          startDateTime: new Date(
+            parseInt(row["availabiltyData.startDateTime"])
+          ).toISOString(),
+          endDateTime: new Date(
+            parseInt(row["availabiltyData.endDateTime"])
+          ).toISOString(),
           totalTime: row["availabiltyData.totalTime"],
           userPlayTime: row["availabiltyData.userPlayTime"],
         },
@@ -64,8 +68,10 @@ class tournamentDAO {
         updatedAt: row["updatedAt"],
         pushedToNakama: row["pushedToNakama"],
       }));
+
+      return res;
     } catch (error: any) {
-      // console.log(error);
+      console.log(error);
       throw error;
     }
   }
@@ -114,8 +120,12 @@ class tournamentDAO {
           icon: row["metaData.icon"],
         },
         availabiltyData: {
-          startDateTime: row["availabiltyData.startDateTime"],
-          endDateTime: row["availabiltyData.endDateTime"],
+          startDateTime: new Date(
+            parseInt(row["availabiltyData.startDateTime"])
+          ).toISOString(), //converting into iso time
+          endDateTime: new Date(
+            parseInt(row["availabiltyData.endDateTime"])
+          ).toISOString(), // converting into iso time
           totalTime: row["availabiltyData.totalTime"],
           userPlayTime: row["availabiltyData.userPlayTime"],
         },
@@ -128,7 +138,6 @@ class tournamentDAO {
         updatedAt: row["updatedAt"],
       }));
     } catch (error: any) {
-      //console.log(error);
       throw error;
     }
   }
@@ -153,7 +162,7 @@ class tournamentDAO {
       tournament.metaData.category = crypto.randomUUID();
 
       //use the already defined function again to craete the copy
-      const id = await this.insertTournament(tournament);
+      const id = await this.insertTournament(tournament, false);
       return id;
     } catch (error: any) {
       //console.log(error);
@@ -161,9 +170,18 @@ class tournamentDAO {
     }
   }
 
-  async insertTournament(tournament: Tournament) {
+  async insertTournament(tournament: Tournament, isEdit: boolean) {
     //putting tournament logic
+
+    console.log("Created at is : ", tournament.createdAt);
     try {
+      const startTime = tournament.availabiltyData.startDateTime;
+      const endTime = tournament.availabiltyData.endDateTime;
+
+      //convert into the epoc times
+      const epocStartTime = new Date(startTime).getTime();
+      const epocEndTime = new Date(endTime).getTime();
+
       const [{ id }] = await db
         .table(TOURNAMENT_TABLE_NAME)
         .insert({
@@ -171,13 +189,15 @@ class tournamentDAO {
           title: tournament.metaData.title,
           league: tournament.metaData.league,
           icon: tournament.metaData.icon,
-          start_datetime: tournament.availabiltyData.startDateTime,
-          end_datetime: tournament.availabiltyData.endDateTime,
+          start_datetime: epocStartTime,
+          end_datetime: epocEndTime,
           user_play_time: tournament.availabiltyData.userPlayTime,
           total_play_time: tournament.availabiltyData.totalTime,
           hole_count: tournament.holeData.holeCount,
           is_random: tournament.holeData.isRandom,
           pushed_to_nakama: tournament.pushedToNakama,
+          created_at: isEdit ? tournament.createdAt : new Date().toISOString(), // if it is edit then it will use the created at date of prev tournamnet
+          updated_at: isEdit ? new Date().toISOString() : null, // if it is edit then update the updated at date
         })
         .returning("id");
 
@@ -208,7 +228,6 @@ class tournamentDAO {
       // Return the count as a number
       return parseInt(result.count, 10);
     } catch (error: any) {
-      console.error(error);
       throw error;
     }
   }

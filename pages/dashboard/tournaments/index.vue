@@ -293,6 +293,10 @@ const handlePushToNakama = async () => {
         if (res.success) {
             alert("Pushed To Nakama");
         }
+        else
+        {
+            throw new Error();
+        }
         await loadItems({
             page: 1, // Assuming you want to start from the first page
             itemsPerPage: itemsPerPage.value,

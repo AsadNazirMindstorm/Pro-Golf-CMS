@@ -35,9 +35,6 @@
                 </v-icon>
             </template>
         </v-data-table-server>
-        <div>
-            {{ selected }}
-        </div>
     </div>
 </template>
 
@@ -182,7 +179,7 @@ const handleDelete = (item: any) => {
 
 const handleDuplicate = (item: any) => {
 
-    if (holeDataForForm.value.holeCount >= holeDataForForm.value.holeData.length && holeDataForForm.value.isRandom == false) {
+    if (holeDataForForm.value.holeCount == holeDataForForm.value.holeData.length && holeDataForForm.value.isRandom == false) {
         alert("Cannot create a copy please change hole count");
         return;
     }

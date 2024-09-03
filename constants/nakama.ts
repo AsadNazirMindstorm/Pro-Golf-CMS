@@ -7,9 +7,10 @@ export const HOST ="localhost"
 export const KEY = "defaultkey";
 export const PORT = "7350";
 export const useSSL = false;
-export const EMAIL = "asad@gmail.com";
+export const EMAIL = "asad2@gmail.com";
 export const PASSWORD = "12137628713xks";
 export const COLLECTION_NAME="Tournaments";
+export const TOURNAMENT_STORAGE_RPC="puttournamentrpc"
 
 export interface IStorageRequest{
     collectionName:string

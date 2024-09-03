@@ -1,6 +1,6 @@
 <template>
     <v-btn color="blue" @click="handleOpening" :disabled="isCreatedDisabled" prepend-icon="mdi-plus">Create</v-btn>
-    <v-dialog max-width="500" v-model="isOpen" persistent :close-on-content-click="false">
+    <v-dialog max-width="550" v-model="isOpen" persistent :close-on-content-click="false">
         <template v-slot:default="{ isActive }">
 
             <v-card title="Dialog">

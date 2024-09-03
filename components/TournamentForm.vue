@@ -116,7 +116,7 @@ const nextClick = (callback: () => void) => {
     }
     else if (e1.value == 2) {
         // console.log(availabiltyFormData.value);
-        isValid = useAjv().validate(AvailabilitySchema, availabiltyFormData.value);
+        isValid = useAjv().validateAvailabiltyFormData(availabiltyFormData.value);
     }
     else if (e1.value == 3) {
         isValid = useAjv().validateHoleForm(holeFormData.value);
@@ -153,7 +153,7 @@ const handleSubmit = async () => {
         metaData: metaFormData.value,
         holeData: holeFormData.value,
         availabiltyData: availabiltyFormData.value,
-        pushedToNakama:false
+        pushedToNakama: false
     };
 
     //Final Object
@@ -204,7 +204,8 @@ const handleEdit = async () => {
             metaData: metaFormData.value,
             holeData: holeFormData.value,
             availabiltyData: availabiltyFormData.value,
-            pushedToNakama:false
+            pushedToNakama: false,
+            createdAt: tournamentData.value?.createdAt
         };
 
         const res = await $fetch('/api/editTournament',

@@ -20,11 +20,13 @@ export const AvailabilitySchema: JSONSchemaType<Availability> = {
         },
         totalTime: {
             type: 'number',
-            description: 'Total time in minutes or hours', // Adjust as needed
+            description: 'Total time in minutes or hours',
+            minimum:0 // Adjust as needed
         },
         userPlayTime: {
             type: 'number',
-            description: 'User play time in minutes or hours', // Adjust as needed
+            description: 'User play time in minutes or hours',
+            minimum:0 // Adjust as needed
             
         },
     },

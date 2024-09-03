@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
       throw new Error("Hole Data is not correct");
 
     //returning the id after inserting
-    const id = await tournamentDAO.insertTournament(body);
+    const id = await tournamentDAO.insertTournament(body, false);
 
     //Succesfully return the Id created at the database
     return (serverResponse = {

@@ -12,6 +12,7 @@ let metaSchema: JSONSchemaType<Meta> = {
   properties: {
     category: {
       type: "string",
+      format:'uuid'
     },
     title: {
       type: "string",

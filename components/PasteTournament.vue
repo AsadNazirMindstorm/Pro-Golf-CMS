@@ -39,6 +39,12 @@ const parseJson = async (isActive: any) => {
         const parsedData: Tournament = JSON.parse(title.value);
         // console.log('Parsed Data:', parsedData);
 
+        if (parsedData.metaData != undefined || parsedData != null) {
+
+            //creating a new UUID for the copy
+            parsedData.metaData.category = crypto.randomUUID();
+        }
+
         if (!useAjv().validate(metaSchema, parsedData.metaData))
             throw new Error();
         if (!useAjv().validate(AvailabilitySchema, parsedData.availabiltyData))
@@ -46,18 +52,17 @@ const parseJson = async (isActive: any) => {
         if (!useAjv().validateHoleForm(parsedData.holeData))
             throw new Error();
 
-        const res = await $fetch('/api/copyTournament',{
-            method:'POST',
-            body:JSON.stringify(parsedData)
+        const res = await $fetch('/api/copyTournament', {
+            method: 'POST',
+            body: JSON.stringify(parsedData)
         })
 
 
-        if(res.success)
-        {
+        if (res.success) {
             alert("Entered Succesfully")
         }
 
-        else{
+        else {
             alert("error");
         }
 
