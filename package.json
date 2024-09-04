@@ -24,6 +24,7 @@
   "devDependencies": {
     "@nuxt/ui": "^2.18.4",
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "@types/diff": "^5.2.2",
     "nuxt": "^3.13.0",
     "vuetify-nuxt-module": "^0.16.1"
   }

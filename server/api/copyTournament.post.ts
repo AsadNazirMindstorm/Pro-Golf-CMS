@@ -1,4 +1,5 @@
 import { useAjv } from "~/composable/Ajv";
+import changlogDAO, { Changelog } from "~/DAO/changlogDAO";
 import tournamentDAO from "~/DAO/tournamentDAO";
 import { ServerResponse } from "~/schemas/responseSchema";
 import { AvailabilitySchema } from "~/schemas/tournament/availabiltySchema";
@@ -23,6 +24,24 @@ export default defineEventHandler(async (event) => {
 
     //then store it
     const res = await tournamentDAO.createCopy(body);
+
+    //change log data to be inserted
+    const newDataToBeInsertedIntoTheChangeLogs: Tournament = {
+      metaData: body.metaData,
+      availabiltyData: body.availabiltyData,
+      holeData: body.holeData,
+      pushedToNakama: body.pushedToNakama,
+    };
+
+    //ChangeLog Record
+    const changelogRecord: Changelog = {
+      tournament_id: body.metaData.category,
+      old_data: {},
+      new_data: newDataToBeInsertedIntoTheChangeLogs,
+      action: "DUPLICATE",
+    };
+
+    const changeLogRes = await changlogDAO.enterChangeLog(changelogRecord);
 
     return (serverResponse = {
       success: true,

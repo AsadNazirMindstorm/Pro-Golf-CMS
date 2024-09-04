@@ -1,4 +1,5 @@
 import { useAjv } from "~/composable/Ajv";
+import changlogDAO, { Changelog } from "~/DAO/changlogDAO";
 import tournamentDAO from "~/DAO/tournamentDAO";
 import { ServerResponse } from "~/schemas/responseSchema";
 import { AvailabilitySchema } from "~/schemas/tournament/availabiltySchema";
@@ -22,8 +23,26 @@ export default defineEventHandler(async (event) => {
     if (!useAjv().validateHoleForm(body.holeData))
       throw new Error("Hole Data is not correct");
 
+    //change log data to be inserted
+    const newDataToBeInsertedIntoTheChangeLogs: Tournament = {
+      metaData: body.metaData,
+      availabiltyData: body.availabiltyData,
+      holeData: body.holeData,
+      pushedToNakama: body.pushedToNakama,
+    };
+
     //returning the id after inserting
     const id = await tournamentDAO.insertTournament(body, false);
+
+    //ChangeLog Record
+    const changelogRecord: Changelog = {
+      tournament_id: body.metaData.category,
+      old_data: {},
+      new_data: newDataToBeInsertedIntoTheChangeLogs,
+      action: "CREATE",
+    };
+
+    const changeLogRes = await changlogDAO.enterChangeLog(changelogRecord);
 
     //Succesfully return the Id created at the database
     return (serverResponse = {
